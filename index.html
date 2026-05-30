@@ -929,35 +929,39 @@
     render();
   }
 
-  // Event listeners - Tab switching
+  // Tab switching — extracted so both click and touchend can share the same logic
+  function activateTab(btn) {
+    const route = btn.dataset.route;
+    document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    state.activeRoute = route;
+
+    document.getElementById("route-content").style.display = "none";
+    document.getElementById("map-content").style.display = "none";
+    document.getElementById("planner-content").style.display = "none";
+
+    if (route === "map") {
+      document.getElementById("map-content").style.display = "block";
+      loadAccommodations().then(() => {
+        setTimeout(() => initMap(), 100);
+        renderAccommodations();
+      });
+    } else if (route === "planner") {
+      document.getElementById("planner-content").style.display = "block";
+    } else {
+      document.getElementById("route-content").style.display = "block";
+      loadApisOnDemand();
+    }
+
+    render();
+  }
+
   document.querySelectorAll(".tab").forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      const route = e.target.closest(".tab").dataset.route;
-      document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
-      e.target.closest(".tab").classList.add("active");
-      state.activeRoute = route;
-      
-      // Hide all content sections
-      document.getElementById("route-content").style.display = "none";
-      document.getElementById("map-content").style.display = "none";
-      document.getElementById("planner-content").style.display = "none";
-      
-      // Show selected content
-      if (route === "map") {
-        document.getElementById("map-content").style.display = "block";
-        loadAccommodations().then(() => {
-          setTimeout(() => initMap(), 100);
-          renderAccommodations();
-        });
-      } else if (route === "planner") {
-        document.getElementById("planner-content").style.display = "block";
-      } else {
-        document.getElementById("route-content").style.display = "block";
-        loadApisOnDemand();
-      }
-      
-      render();
-    });
+    btn.addEventListener("click", () => activateTab(btn));
+    btn.addEventListener("touchend", (e) => {
+      e.preventDefault(); // stops the redundant synthesised click that follows touchend
+      activateTab(btn);
+    }, { passive: false });
   });
 
   document.getElementById("safeMode").addEventListener("click", (e) => {
