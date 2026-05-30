@@ -408,6 +408,17 @@
     return co2[service] || '—';
   }
 
+  function getReliabilityWarningHTML(name, service) {
+    let text = null;
+    if (service === 'train' && name.match(/coventry/i)) {
+      text = '⚠️ Coventry station has high cancellation rates. Check live times before travelling.';
+    } else if (/U1|U2|Leamington/i.test(name)) {
+      text = '⚠️ U1/U2 services currently unreliable — delays likely. Consider alternatives below.';
+    }
+    if (!text) return '';
+    return `<div class="route-warning" style="margin: 0 20px 12px; padding: 8px 10px; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.45); border-radius: 8px; display: flex; align-items: flex-start; gap: 8px;"><div style="flex: 1; min-width: 0;"><div style="font-size: 12px; color: #92400E; font-weight: 500;">${text}</div><div style="font-size: 10px; color: #B45309; margin-top: 3px;">Based on Boar reporting, May 2026</div></div><button onclick="this.closest('.route-warning').style.display='none'; event.stopPropagation()" style="background: none; border: none; color: #92400E; cursor: pointer; font-size: 14px; padding: 0 0 0 6px; flex-shrink: 0; line-height: 1; opacity: 0.7;">✕</button></div>`;
+  }
+
   function render() {
     // Update Safe Return banners (runs regardless of active tab)
     const safeMsgEl = document.getElementById('safe-return-msg');
@@ -463,6 +474,7 @@
               <div class="card-chevron">▼</div>
             </div>
           </div>
+          ${getReliabilityWarningHTML(opt.name, opt.service)}
           <div class="card-details">
             ${state.safeMode && opt.service === 'walk' ? '<div style="font-size: 11px; color: #D97706; font-weight: 600; margin-bottom: 8px;">⚠️ Solo walk required</div>' : ''}
             <div style="font-size: 11px; color: #999999; margin-bottom: 8px;">${opt.notes} · ${opt.time} min</div>
@@ -1177,6 +1189,7 @@
 
           return `
             <div class="option-card" style="${isUnavailable ? 'opacity: 0.5; background: #F3F4F6;' : ''}">
+              ${getReliabilityWarningHTML(r.route, r.service || 'bus')}
               <div style="flex: 1; min-width: 0;">
                 <div style="font-size: 13px; font-weight: 600; color: #003366;">
                   ${idx + 1}. ${r.route}
