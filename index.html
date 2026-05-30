@@ -31,7 +31,12 @@
   .toggle.active { background: #9333EA; }
   .toggle-slider { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 999px; background: #fff; transition: left 0.2s; }
   .toggle.active .toggle-slider { left: 25px; }
-  .option-card { background: #FFFFFF; border: 1px solid #E8EBF0; border-radius: 14px; padding: 16px 20px; margin: 0.5rem 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; transition: all 0.2s; }
+  .option-card { background: #FFFFFF; border: 1px solid #E8EBF0; border-radius: 14px; margin: 0.5rem 0; transition: all 0.2s; cursor: pointer; overflow: hidden; }
+  .card-summary { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; gap: 12px; }
+  .card-details { overflow: hidden; max-height: 0; padding: 0 20px; transition: max-height 0.25s ease, padding 0.25s ease; }
+  .option-card.expanded .card-details { max-height: 320px; padding: 10px 20px 16px; }
+  .card-chevron { font-size: 10px; color: #BBBBBB; transition: transform 0.25s; flex-shrink: 0; line-height: 1; }
+  .option-card.expanded .card-chevron { transform: rotate(180deg); }
   .option-card.best { background: linear-gradient(135deg, rgba(147,51,234,0.08) 0%, rgba(99,102,241,0.08) 100%); border: 1.5px solid rgba(147,51,234,0.3); }
   .header { margin-bottom: 28px; }
   .header h1 { font-size: 28px; font-weight: 700; line-height: 1.2; margin: 0; color: #003366; }
@@ -387,6 +392,23 @@
     return estimates[service] || { range: '—', note: null };
   }
 
+  function toggleCard(card) {
+    card.classList.toggle('expanded');
+  }
+
+  function getCO2Estimate(service) {
+    const co2 = {
+      bus:     '~0.7 kg per trip (89 g/km)',
+      train:   '~0.6 kg per trip (41 g/km)',
+      lime:    '~30 g per trip (5 g/km)',
+      uber:    '~1.4 kg per trip (171 g/km)',
+      taxi:    '~1.4 kg per trip (171 g/km)',
+      walk:    'Zero emissions',
+      cycling: 'Zero emissions'
+    };
+    return co2[service] || '—';
+  }
+
   function render() {
     // Update Safe Return banners (runs regardless of active tab)
     const safeMsgEl = document.getElementById('safe-return-msg');
@@ -428,25 +450,34 @@
       const estimate = getCostEstimate(opt.service);
 
       return `
-        <div class="option-card">
-          <div style="flex: 1; min-width: 0;">
-            <div style="font-size: 13px; font-weight: 600; color: #003366;">${opt.name}</div>
-            ${state.safeMode && opt.service === 'walk' ? '<div style="font-size: 11px; color: #D97706; font-weight: 600; margin-top: 3px;">⚠️ Solo walk required</div>' : ''}
-            <div style="font-size: 11px; color: #999999; margin-top: 4px;">${opt.notes} · ${opt.time} min</div>
-            <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+        <div class="option-card" onclick="toggleCard(this)">
+          <div class="card-summary">
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 13px; font-weight: 600; color: #003366;">${opt.name}</div>
+              <div style="font-size: 11px; color: #999999; margin-top: 2px;">${opt.time} min</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+              <div style="text-align: right;">
+                <div style="font-size: 14px; font-weight: 700; color: #16A34A;">£${cost.toFixed(2)}</div>
+                <div style="font-size: 10px; color: #999999; margin-top: 1px;">per person</div>
+              </div>
+              <div class="card-chevron">▼</div>
+            </div>
+          </div>
+          <div class="card-details">
+            ${state.safeMode && opt.service === 'walk' ? '<div style="font-size: 11px; color: #D97706; font-weight: 600; margin-bottom: 8px;">⚠️ Solo walk required</div>' : ''}
+            <div style="font-size: 11px; color: #999999; margin-bottom: 8px;">${opt.notes} · ${opt.time} min</div>
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;">
               <span style="font-size: 10px; background: rgba(22,163,74,0.12); color: #16A34A; border-radius: 4px; padding: 1px 5px; font-weight: 700;">£</span>
               <span style="font-size: 13px; font-weight: 600; color: #003366;">${estimate.range}</span>
               ${estimate.note ? `<span style="font-size: 11px; color: #6B21A8;">${estimate.note}</span>` : ''}
             </div>
             ${arrival ? `
-              <div style="font-size: 12px; color: #003366; margin-top: 6px; font-weight: 500;">
-                🚌 Departs: <strong>${formatTime(departure.hour, departure.min)}</strong> → Arrives: <strong>${arrival.display}</strong>
+              <div style="font-size: 12px; color: #003366; margin-bottom: 8px; font-weight: 500;">
+                🚌 <strong>${formatTime(departure.hour, departure.min)}</strong> → <strong>${arrival.display}</strong>
               </div>
             ` : ''}
-          </div>
-          <div style="text-align: right;">
-            <div style="font-size: 14px; font-weight: 700; color: #16A34A;">£${cost.toFixed(2)}</div>
-            <div style="font-size: 10px; color: #999999; margin-top: 2px;">per person</div>
+            <div style="font-size: 11px; color: #666666;">🌱 ${getCO2Estimate(opt.service)}</div>
           </div>
         </div>
       `;
@@ -454,17 +485,23 @@
 
     if (state.safeMode) {
       container.innerHTML += `
-        <div class="option-card" style="border: 1.5px solid rgba(245,158,11,0.4); background: rgba(255,251,235,0.5);">
-          <div style="flex: 1; min-width: 0;">
-            <div style="font-size: 13px; font-weight: 600; color: #003366;">🚖 Share a taxi — split the cost</div>
-            <div style="font-size: 11px; color: #999999; margin-top: 4px;">Safer with others · estimate £8–14</div>
-            <div style="margin-top: 6px; font-size: 12px; color: #003366; display: flex; gap: 12px; flex-wrap: wrap;">
+        <div class="option-card" style="border: 1.5px solid rgba(245,158,11,0.4); background: rgba(255,251,235,0.5);" onclick="toggleCard(this)">
+          <div class="card-summary">
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 13px; font-weight: 600; color: #003366;">🚖 Share a taxi — split the cost</div>
+              <div style="font-size: 11px; color: #999999; margin-top: 2px;">Safer with others · tap for split costs</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+              <div style="font-size: 10px; color: #D97706; font-weight: 700; background: rgba(245,158,11,0.15); border-radius: 4px; padding: 3px 7px; white-space: nowrap;">SAFE</div>
+              <div class="card-chevron">▼</div>
+            </div>
+          </div>
+          <div class="card-details">
+            <div style="font-size: 12px; color: #003366; display: flex; gap: 16px; flex-wrap: wrap;">
               <span><strong>2 people:</strong> £4–7 pp</span>
               <span><strong>3 people:</strong> £2.70–4.70 pp</span>
             </div>
-          </div>
-          <div style="text-align: right; flex-shrink: 0;">
-            <div style="font-size: 10px; color: #D97706; font-weight: 700; background: rgba(245,158,11,0.15); border-radius: 4px; padding: 3px 7px; white-space: nowrap;">SAFE OPTION</div>
+            <div style="font-size: 11px; color: #999999; margin-top: 6px;">Estimate based on £8–14 taxi fare</div>
           </div>
         </div>
       `;
