@@ -636,8 +636,10 @@
       min: now.getMinutes()
     };
   }
+
+  function calculateJourneyTime(distance, mode) {
     // distance is in km (approx from lat/lng difference * 111)
-    
+
     switch(mode) {
       case 'bus':
         // Average bus speed: 15 mph = 24 km/h in urban areas
