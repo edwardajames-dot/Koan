@@ -82,6 +82,25 @@
     <button class="tab" data-route="map"><div class="tab-emoji">🏠</div>Live Map</button>
   </div>
 
+  <div class="card" id="safe-return-section">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div style="width: 24px; height: 24px; background: rgba(147,51,234,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px;">🔒</div>
+      <div>
+        <div style="font-size: 14px; font-weight: 600; color: #003366;">Safe Return 🔒</div>
+        <div style="font-size: 12px; color: #999999;">Filters unsafe solo routes after dark</div>
+      </div>
+      <button id="safeMode" class="toggle" style="margin-left: auto;">
+        <div class="toggle-slider"></div>
+      </button>
+    </div>
+    <div id="safe-return-msg" style="display: none; margin-top: 12px; padding: 10px 14px; background: rgba(245,158,11,0.1); border-radius: 10px; border-left: 3px solid #F59E0B; font-size: 13px; color: #92400E;">
+      Showing safest options only. Walking routes on unlit roads hidden.
+    </div>
+    <div id="late-night-banner" style="display: none; margin-top: 12px; padding: 10px 14px; background: rgba(147,51,234,0.1); border-radius: 10px; border-left: 3px solid #9333EA; font-size: 13px; color: #6B21A8; font-weight: 500;">
+      It's late — Safe Return is on 🔒
+    </div>
+  </div>
+
   <div class="card">
     <div style="font-size: 14px; margin-bottom: 12px; color: #003366; font-weight: 600;">💳 Wallet & Preferences</div>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
@@ -101,18 +120,6 @@
     </div>
   </div>
 
-  <div class="card">
-    <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
-      <div style="width: 24px; height: 24px; background: rgba(147,51,234,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px;">🛡️</div>
-      <div>
-        <div style="font-size: 14px; font-weight: 600; color: #003366;">Safe Return Mode</div>
-        <div style="font-size: 12px; color: #999999;">Hides cycling after dark</div>
-      </div>
-      <button id="safeMode" class="toggle" style="margin-left: auto;">
-        <div class="toggle-slider"></div>
-      </button>
-    </div>
-  </div>
 
 
 
@@ -361,6 +368,7 @@
   let state = {
     activeRoute: "morning",
     safeMode: false,
+    autoSafeMode: false,
     groupSize: 1,
     wallet: { busPass: false, unirider: false, railcard: false },
     apiData: { lime: null, bods: null, darwin: null, tfwm: null }
@@ -380,21 +388,28 @@
   }
 
   function render() {
+    // Update Safe Return banners (runs regardless of active tab)
+    const safeMsgEl = document.getElementById('safe-return-msg');
+    const lateNightBanner = document.getElementById('late-night-banner');
+    if (safeMsgEl) safeMsgEl.style.display = (state.safeMode && !state.autoSafeMode) ? 'block' : 'none';
+    if (lateNightBanner) lateNightBanner.style.display = (state.safeMode && state.autoSafeMode) ? 'block' : 'none';
+
     const route = ROUTES[state.activeRoute];
+    if (!route) return; // map or planner tab — no route content to render
+
     const container = document.getElementById("options-container");
     const titleEl = document.getElementById("route-title");
     const fromEl = document.getElementById("route-from");
-    
+
     titleEl.textContent = route.title;
     fromEl.textContent = `📍 ${route.from} · ${route.time}`;
-    
+
     let filtered = route.options;
     if (state.safeMode) {
-      // Only filter Lime if it's night time (after 22:00 or before 6:00)
       const hour = parseInt(route.time.split(':')[0]);
       const isNight = hour >= 22 || hour < 6;
       if (isNight) {
-        filtered = filtered.filter(o => o.id !== "lime");
+        filtered = filtered.filter(o => o.id !== "lime" && o.service !== "walk");
       }
     }
     
@@ -416,6 +431,7 @@
         <div class="option-card">
           <div style="flex: 1; min-width: 0;">
             <div style="font-size: 13px; font-weight: 600; color: #003366;">${opt.name}</div>
+            ${state.safeMode && opt.service === 'walk' ? '<div style="font-size: 11px; color: #D97706; font-weight: 600; margin-top: 3px;">⚠️ Solo walk required</div>' : ''}
             <div style="font-size: 11px; color: #999999; margin-top: 4px;">${opt.notes} · ${opt.time} min</div>
             <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
               <span style="font-size: 10px; background: rgba(22,163,74,0.12); color: #16A34A; border-radius: 4px; padding: 1px 5px; font-weight: 700;">£</span>
@@ -435,8 +451,26 @@
         </div>
       `;
     }).join("");
-    
-    document.getElementById("insight-text").textContent = 
+
+    if (state.safeMode) {
+      container.innerHTML += `
+        <div class="option-card" style="border: 1.5px solid rgba(245,158,11,0.4); background: rgba(255,251,235,0.5);">
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 13px; font-weight: 600; color: #003366;">🚖 Share a taxi — split the cost</div>
+            <div style="font-size: 11px; color: #999999; margin-top: 4px;">Safer with others · estimate £8–14</div>
+            <div style="margin-top: 6px; font-size: 12px; color: #003366; display: flex; gap: 12px; flex-wrap: wrap;">
+              <span><strong>2 people:</strong> £4–7 pp</span>
+              <span><strong>3 people:</strong> £2.70–4.70 pp</span>
+            </div>
+          </div>
+          <div style="text-align: right; flex-shrink: 0;">
+            <div style="font-size: 10px; color: #D97706; font-weight: 700; background: rgba(245,158,11,0.15); border-radius: 4px; padding: 3px 7px; white-space: nowrap;">SAFE OPTION</div>
+          </div>
+        </div>
+      `;
+    }
+
+    document.getElementById("insight-text").textContent =
       state.activeRoute === "morning" ? "12X (BODS) is free with Bus Pass. Lime stock live." :
       state.activeRoute === "nightout" ? "Train via Darwin real-time. Split costs with group." :
       "Late night: rideshare only. Pre-book.";
@@ -891,6 +925,7 @@
 
   document.getElementById("safeMode").addEventListener("click", (e) => {
     state.safeMode = !state.safeMode;
+    state.autoSafeMode = false;
     e.target.closest(".toggle").classList.toggle("active");
     render();
   });
@@ -907,8 +942,15 @@
     });
   });
 
-  // Initialize (removed API calls - now lazy loaded on tab click)
-  
+  // Initialize — auto-activate Safe Return after 22:00, then render
+  const _initHour = new Date().getHours();
+  if (_initHour >= 22 || _initHour < 6) {
+    state.safeMode = true;
+    state.autoSafeMode = true;
+    document.getElementById('safeMode').classList.add('active');
+  }
+  render();
+
   // Map tab handling (integrated with main tab listener above)
 
   // Autocomplete function
