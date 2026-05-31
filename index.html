@@ -68,6 +68,8 @@
   .route-badge { display: inline-block; padding: 2px 6px; background: #F0F4F8; border-radius: 4px; font-size: 11px; color: #666666; margin-right: 6px; }
   .toggle::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); min-width: 44px; min-height: 44px; }
   #groupSize, #budget-filter, #commute-filter, #journey-day, #journey-time, #search-route { min-height: 44px; }
+  .filter-pill { padding: 6px 12px; border-radius: 999px; border: 1px solid #E8EBF0; background: #FFFFFF; color: #666666; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .filter-pill.active { border-color: #9333EA; background: rgba(147,51,234,0.10); color: #6B21A8; font-weight: 600; }
 
   /* Collapsible cards (Safe Return, Wallet) */
   .collapsible-card .collapsible-body { overflow: hidden; max-height: 0; transition: max-height 0.3s ease, padding 0.3s ease; padding-top: 0; }
@@ -1237,10 +1239,84 @@
     displayRouteResults(fromLoc, toLoc, routesWithAvailability, time, dayName, availableServices, distanceKm);
   });
   
+  // ── Planner filter state ────────────────────────────────────────
+  let _plannerFilter = null; // null | 'free' | 'cheapest' | 'fastest'
+  let _lastPlannerSearch = null; // stores last search context for re-renders
+
+  function setPlannerFilter(pill) {
+    _plannerFilter = (_plannerFilter === pill) ? null : pill;
+    document.querySelectorAll('.filter-pill').forEach(el => {
+      el.classList.toggle('active', el.dataset.filter === _plannerFilter);
+    });
+    renderPlannerCards();
+  }
+
+  function renderPlannerCards() {
+    const s = _lastPlannerSearch;
+    if (!s) return;
+    const cardsDiv = document.getElementById('planner-cards');
+    if (!cardsDiv) return;
+
+    let routes = [...s.routes];
+
+    if (_plannerFilter === 'free') {
+      routes = routes.filter(r => r.cost === 0);
+    } else if (_plannerFilter === 'cheapest') {
+      routes = routes.slice().sort((a, b) => a.cost - b.cost);
+    } else if (_plannerFilter === 'fastest') {
+      routes = routes.slice().sort((a, b) => a.time - b.time);
+    }
+
+    if (routes.length === 0) {
+      cardsDiv.innerHTML = `<div style="padding: 20px; text-align: center; color: #999999; background: #F8F9FA; border-radius: 8px;">No ${_plannerFilter === 'free' ? 'free' : ''} routes match this filter</div>`;
+      return;
+    }
+
+    const [userHour, userMin] = s.time.split(':').map(Number);
+    cardsDiv.innerHTML = routes.map((r, idx) => {
+      const isUnavailable = r.limeUnavailable;
+      const departure = getNextDeparture(r.service || 'bus', userHour, userMin);
+      const arrival = departure ? getArrivalTime(departure.hour, departure.min, r.time, departure.variance) : null;
+      const estimate = getCostEstimate(r.service || 'bus');
+      return `
+        <div class="option-card" style="${isUnavailable ? 'opacity: 0.5; background: #F3F4F6;' : ''}">
+          ${getReliabilityWarningHTML(r.route, r.service || 'bus')}
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 13px; font-weight: 600; color: #003366;">
+              ${idx + 1}. ${r.route}
+              ${isUnavailable ? '<span style="font-size: 10px; color: #999999; margin-left: 8px;"> (not available in this area)</span>' : ''}
+            </div>
+            <div style="font-size: 11px; color: #999999; margin-top: 4px;">${r.notes}</div>
+            <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+              <span style="font-size: 10px; background: rgba(22,163,74,0.12); color: #16A34A; border-radius: 4px; padding: 1px 5px; font-weight: 700;">£</span>
+              <span style="font-size: 13px; font-weight: 600; color: #003366;">${estimate.range}</span>
+              ${estimate.note ? `<span style="font-size: 11px; color: #6B21A8;">${estimate.note}</span>` : ''}
+            </div>
+            ${arrival ? `
+              <div style="font-size: 12px; color: #003366; margin-top: 8px; font-weight: 500;">
+                🚌 Departs: <strong>${formatTime(departure.hour, departure.min)}</strong>
+                │ Arrives: <strong>${arrival.display}</strong>
+                ${arrival.isRange ? '<span style="font-size: 10px; color: #999999;"> (estimated)</span>' : ''}
+              </div>
+            ` : ''}
+          </div>
+          <div style="text-align: right; min-width: 80px;">
+            <div style="font-size: 14px; font-weight: 700; color: #003366;">£${typeof r.cost === 'number' ? r.cost.toFixed(2) : r.cost}</div>
+            <div style="font-size: 10px; color: #999999; margin-top: 2px;">${r.time} min · ${r.reliability}% reliable</div>
+            ${isUnavailable ? '<div style="font-size: 9px; color: #999999; margin-top: 4px;">Would cost: £' + r.cost.toFixed(2) + '</div>' : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
   function displayRouteResults(from, to, routes, time, dayName, availableServices, distanceKm) {
     const resultsDiv = document.getElementById('planner-results');
-    
-    // Show warning if limited services
+
+    // Store search context for filter re-renders; reset active filter on new search
+    _plannerFilter = null;
+    _lastPlannerSearch = { routes, time, dayName, availableServices };
+
     let warningHtml = '';
     if (routes.length === 0) {
       warningHtml = `
@@ -1257,74 +1333,34 @@
         </div>
       `;
     }
-    
+
+    const hasFreeRoute = routes.some(r => r.cost === 0);
+
     resultsDiv.innerHTML = `
       <div style="margin-bottom: 12px; padding: 12px; background: rgba(147,51,234,0.08); border-radius: 8px; border-left: 3px solid #9333EA;">
-        <div style="font-size: 13px; color: #003366; font-weight: 600;">
-          ${from.name} → ${to.name}
-        </div>
-        <div style="font-size: 11px; color: #999999; margin-top: 4px;">
-          ${dayName} at ${time} · ${distanceKm.toFixed(1)}km · ${from.area} to ${to.area}
-        </div>
+        <div style="font-size: 13px; color: #003366; font-weight: 600;">${from.name} → ${to.name}</div>
+        <div style="font-size: 11px; color: #999999; margin-top: 4px;">${dayName} at ${time} · ${distanceKm.toFixed(1)}km · ${from.area} to ${to.area}</div>
       </div>
-      
+
       ${warningHtml}
-      
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        ${routes.length > 0 ? routes.map((r, idx) => {
-          const isUnavailable = r.limeUnavailable;
-          
-          // Calculate departure time from the selected time
-          const [userHour, userMin] = time.split(':').map(Number);
-          const departure = getNextDeparture(r.service || 'bus', userHour, userMin);
-          const arrival = departure ? getArrivalTime(departure.hour, departure.min, r.time, departure.variance) : null;
-          const estimate = getCostEstimate(r.service || 'bus');
 
-          return `
-            <div class="option-card" style="${isUnavailable ? 'opacity: 0.5; background: #F3F4F6;' : ''}">
-              ${getReliabilityWarningHTML(r.route, r.service || 'bus')}
-              <div style="flex: 1; min-width: 0;">
-                <div style="font-size: 13px; font-weight: 600; color: #003366;">
-                  ${idx + 1}. ${r.route}
-                  ${isUnavailable ? '<span style="font-size: 10px; color: #999999; margin-left: 8px;"> (not available in this area)</span>' : ''}
-                </div>
-                <div style="font-size: 11px; color: #999999; margin-top: 4px;">${r.notes}</div>
-                <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                  <span style="font-size: 10px; background: rgba(22,163,74,0.12); color: #16A34A; border-radius: 4px; padding: 1px 5px; font-weight: 700;">£</span>
-                  <span style="font-size: 13px; font-weight: 600; color: #003366;">${estimate.range}</span>
-                  ${estimate.note ? `<span style="font-size: 11px; color: #6B21A8;">${estimate.note}</span>` : ''}
-                </div>
+      ${routes.length > 0 ? `
+        <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+          ${hasFreeRoute ? `<button class="filter-pill" data-filter="free" onclick="setPlannerFilter('free')">🆓 Free</button>` : ''}
+          <button class="filter-pill" data-filter="cheapest" onclick="setPlannerFilter('cheapest')">💰 Cheapest</button>
+          <button class="filter-pill" data-filter="fastest" onclick="setPlannerFilter('fastest')">⚡ Fastest</button>
+        </div>
+      ` : ''}
 
-                ${arrival ? `
-                  <div style="font-size: 12px; color: #003366; margin-top: 8px; font-weight: 500;">
-                    🚌 Departs: <strong>${formatTime(departure.hour, departure.min)}</strong> 
-                    │ Arrives: <strong>${arrival.display}</strong>
-                    ${arrival.isRange ? '<span style="font-size: 10px; color: #999999;"> (estimated)</span>' : ''}
-                  </div>
-                ` : ''}
-              </div>
-              
-              <div style="text-align: right; min-width: 80px;">
-                <div style="font-size: 14px; font-weight: 700; color: #003366;">£${typeof r.cost === 'number' ? r.cost.toFixed(2) : r.cost}</div>
-                <div style="font-size: 10px; color: #999999; margin-top: 2px;">
-                  ${r.time} min · ${r.reliability}% reliable
-                </div>
-                ${isUnavailable ? '<div style="font-size: 9px; color: #999999; margin-top: 4px;">Would cost: £' + r.cost.toFixed(2) + '</div>' : ''}
-              </div>
-            </div>
-          `;
-        }).join('') : `
-          <div style="padding: 20px; text-align: center; color: #999999; background: #F8F9FA; border-radius: 8px;">
-            Only Uber and Taxi available at this time
-          </div>
-        `}
-      </div>
-      
+      <div id="planner-cards" style="display: flex; flex-direction: column; gap: 10px;"></div>
+
       <div style="margin-top: 12px; padding: 12px; background: #F0F9FF; border-radius: 8px; border-left: 3px solid #0284C7; font-size: 11px; color: #0C4A6E;">
         <strong>💡 Available services:</strong> ${availableServices.join(' · ')}
         ${routes.some(r => r.limeUnavailable) ? '<br><strong>ℹ️ Lime</strong> only operates in Coventry (CV1-6) & University of Warwick campus' : ''}
       </div>
     `;
+
+    renderPlannerCards();
   }
 
   // Filter event listeners
