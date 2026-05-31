@@ -1162,97 +1162,112 @@
   setupAutocomplete('from-location', 'from-suggestions');
   setupAutocomplete('to-location', 'to-suggestions');
 
-  // Route planner search
-  document.getElementById('search-route').addEventListener('click', () => {
+  // ── Route planner search (extracted so demo mode can call it too) ──
+  function runPlannerSearch() {
     const fromText = document.getElementById('from-location').value.trim();
     const toText = document.getElementById('to-location').value.trim();
     const time = document.getElementById('journey-time').value;
     const day = parseInt(document.getElementById('journey-day').value);
-    
+
     if (!fromText || !toText) {
       alert('Please enter both starting location and destination');
       return;
     }
-    
-    // Find matching locations by name or postcode
-    const fromLoc = LOCATIONS.find(loc => 
+
+    const fromLoc = LOCATIONS.find(loc =>
       loc.name.toLowerCase() === fromText.toLowerCase() ||
       loc.postcodes.some(pc => pc.toUpperCase() === fromText.toUpperCase())
     );
-    const toLoc = LOCATIONS.find(loc => 
+    const toLoc = LOCATIONS.find(loc =>
       loc.name.toLowerCase() === toText.toLowerCase() ||
       loc.postcodes.some(pc => pc.toUpperCase() === toText.toUpperCase())
     );
-    
+
     if (!fromLoc || !toLoc) {
       alert('Location not found. Please select from autocomplete suggestions.');
       return;
     }
-    
-    // Get available services for this time/day
+
     const availableServices = getAvailableRoutes(time, day);
-    
-    // Calculate realistic distance and times
     const distanceKm = calculateDistance(fromLoc.lat, fromLoc.lng, toLoc.lat, toLoc.lng);
-    
-    // Get routes or generate with realistic times
+
     const key = `${fromLoc.id}|${toLoc.id}`;
     let allRoutes = ROUTES_DB[key] || [];
-    
-    // If no pre-defined routes, generate them with realistic times
+
     if (allRoutes.length === 0) {
       allRoutes = [
-        { 
-          route: 'Bus', 
-          cost: 2.4, 
-          time: calculateJourneyTime(distanceKm, 'bus'), 
-          reliability: 88, 
-          notes: 'Via local bus network', 
-          service: 'bus' 
-        },
-        { 
-          route: 'Lime Bike', 
-          cost: Math.round(distanceKm * 0.5), 
-          time: calculateJourneyTime(distanceKm, 'lime'), 
-          reliability: 85, 
-          notes: 'Cycle if available', 
-          service: 'lime' 
-        },
-        { 
-          route: 'Uber', 
-          cost: Math.round(8 + (distanceKm * 1.5)), 
-          time: calculateJourneyTime(distanceKm, 'uber'), 
-          reliability: 92, 
-          notes: 'Door-to-door service', 
-          service: 'uber' 
-        }
+        { route: 'Bus',       cost: 2.4,                          time: calculateJourneyTime(distanceKm, 'bus'),  reliability: 88, notes: 'Via local bus network',  service: 'bus'  },
+        { route: 'Lime Bike', cost: Math.round(distanceKm * 0.5), time: calculateJourneyTime(distanceKm, 'lime'), reliability: 85, notes: 'Cycle if available',       service: 'lime' },
+        { route: 'Uber',      cost: Math.round(8 + distanceKm * 1.5), time: calculateJourneyTime(distanceKm, 'uber'), reliability: 92, notes: 'Door-to-door service', service: 'uber' }
       ];
     } else {
-      // Update times for predefined routes based on actual distance
-      allRoutes = allRoutes.map(r => ({
-        ...r,
-        time: calculateJourneyTime(distanceKm, r.service || 'bus')
-      }));
+      allRoutes = allRoutes.map(r => ({ ...r, time: calculateJourneyTime(distanceKm, r.service || 'bus') }));
     }
-    
-    // Filter routes based on service availability at this time/day
-    const availableRoutes = allRoutes.filter(r => {
-      const service = r.service || 'bus';
-      return isServiceAvailable(service, parseInt(time.split(':')[0]), day);
-    });
-    
-    // Mark Lime as unavailable if outside service area, but keep it for display
+
+    const availableRoutes = allRoutes.filter(r =>
+      isServiceAvailable(r.service || 'bus', parseInt(time.split(':')[0]), day)
+    );
+
     const routesWithAvailability = availableRoutes.map(r => ({
       ...r,
       limeUnavailable: r.service === 'lime' && !isLimeAvailable(toLoc)
     }));
-    
-    // Determine day name
+
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const dayName = dayNames[day];
-    
-    displayRouteResults(fromLoc, toLoc, routesWithAvailability, time, dayName, availableServices, distanceKm);
-  });
+    displayRouteResults(fromLoc, toLoc, routesWithAvailability, time, dayNames[day], availableServices, distanceKm);
+  }
+
+  document.getElementById('search-route').addEventListener('click', runPlannerSearch);
+
+  // ── Demo mode ───────────────────────────────────────────────────
+  const DEMO_ROUTES = [
+    { label: 'UoW → Coventry',   from: 'University of Warwick',    to: 'Coventry City Centre'        },
+    { label: 'UoW → Leamington', from: 'University of Warwick',    to: 'Leamington Spa Town Centre'  },
+    { label: 'Earlsdon → UoW',   from: 'Earlsdon, Coventry',       to: 'University of Warwick'       }
+  ];
+
+  function applyDemoRoute(from, to) {
+    document.getElementById('from-location').value = from;
+    document.getElementById('to-location').value   = to;
+    // Update active pill styling
+    document.querySelectorAll('.demo-pill').forEach(p => {
+      p.classList.toggle('active', p.dataset.from === from && p.dataset.to === to);
+    });
+    runPlannerSearch();
+  }
+
+  function initDemoMode() {
+    // Set current time
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('journey-time').value = `${hh}:${mm}`;
+
+    // Set today's day
+    document.getElementById('journey-day').value = String(now.getDay());
+
+    // Inject quick-switch pills below the search form, above #planner-results
+    const pillsHtml = `
+      <div id="demo-pills" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+        ${DEMO_ROUTES.map(r => `
+          <button class="filter-pill demo-pill" data-from="${r.from}" data-to="${r.to}"
+            onclick="applyDemoRoute('${r.from}','${r.to}')">
+            ${r.label}
+          </button>`).join('')}
+      </div>`;
+    document.getElementById('planner-results').insertAdjacentHTML('beforebegin', pillsHtml);
+
+    // Activate Route Planner tab
+    const plannerTab = document.querySelector('[data-route="planner"]');
+    activateTab(plannerTab);
+
+    // Pre-fill first route and run
+    applyDemoRoute(DEMO_ROUTES[0].from, DEMO_ROUTES[0].to);
+  }
+
+  if (new URLSearchParams(window.location.search).get('demo') === 'true') {
+    initDemoMode();
+  }
   
   // ── Planner filter state ────────────────────────────────────────
   let _plannerFilter = null; // null | 'free' | 'cheapest' | 'fastest'
