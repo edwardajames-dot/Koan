@@ -126,6 +126,7 @@
   <div class="card collapsible-card wallet-card">
     <div class="collapsible-header" onclick="toggleCollapsible(this.closest('.collapsible-card'))">
       <div style="font-size: 14px; color: #003366; font-weight: 600; flex: 1;">💳 Wallet & Preferences</div>
+      <span id="wallet-saved" style="font-size: 11px; color: #16A34A; font-weight: 600; margin-right: 8px; opacity: 0; transition: opacity 0.4s;">Saved ✓</span>
       <span class="collapsible-chevron">▼</span>
     </div>
     <div class="collapsible-body">
@@ -1014,10 +1015,51 @@
     }, { passive: false });
   });
 
+  // ── localStorage persistence ────────────────────────────────────
+  const PREFS_KEY = 'koan_prefs';
+
+  function savePrefs() {
+    localStorage.setItem(PREFS_KEY, JSON.stringify({
+      busPass:   state.wallet.busPass,
+      unirider:  state.wallet.unirider,
+      railcard:  state.wallet.railcard,
+      groupSize: state.groupSize,
+      safeMode:  state.safeMode
+    }));
+    showSaved();
+  }
+
+  function loadPrefs() {
+    try {
+      const raw = localStorage.getItem(PREFS_KEY);
+      if (!raw) return;
+      const p = JSON.parse(raw);
+      if (typeof p.busPass  === 'boolean') { state.wallet.busPass  = p.busPass;  document.getElementById('busPass').checked   = p.busPass;  }
+      if (typeof p.unirider === 'boolean') { state.wallet.unirider = p.unirider; document.getElementById('unirider').checked  = p.unirider; }
+      if (typeof p.railcard === 'boolean') { state.wallet.railcard = p.railcard; document.getElementById('railcard').checked  = p.railcard; }
+      if (typeof p.groupSize === 'number') { state.groupSize = p.groupSize;      document.getElementById('groupSize').value   = p.groupSize; }
+      if (typeof p.safeMode  === 'boolean' && p.safeMode) {
+        state.safeMode = true;
+        state.autoSafeMode = false;
+        document.getElementById('safeMode').classList.add('active');
+      }
+    } catch (e) { /* ignore malformed prefs */ }
+  }
+
+  let _savedTimer = null;
+  function showSaved() {
+    const el = document.getElementById('wallet-saved');
+    if (!el) return;
+    el.style.opacity = '1';
+    clearTimeout(_savedTimer);
+    _savedTimer = setTimeout(() => { el.style.opacity = '0'; }, 1800);
+  }
+
   function handleSafeMode(e) {
     state.safeMode = !state.safeMode;
     state.autoSafeMode = false;
     e.target.closest(".toggle").classList.toggle("active");
+    savePrefs();
     render();
   }
 
@@ -1032,17 +1074,20 @@
 
   document.getElementById("groupSize").addEventListener("change", (e) => {
     state.groupSize = Math.max(1, parseInt(e.target.value));
+    savePrefs();
     render();
   });
 
   ["busPass", "unirider", "railcard"].forEach(id => {
     document.getElementById(id).addEventListener("change", (e) => {
       state.wallet[id] = e.target.checked;
+      savePrefs();
       render();
     });
   });
 
-  // Initialize — auto-activate Safe Return after 22:00, then render
+  // Initialize — load saved prefs, then auto-activate Safe Return after 22:00
+  loadPrefs();
   const _initHour = new Date().getHours();
   if (_initHour >= 22 || _initHour < 6) {
     state.safeMode = true;
