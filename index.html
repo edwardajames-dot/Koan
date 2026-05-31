@@ -1213,6 +1213,18 @@
       limeUnavailable: r.service === 'lime' && !isLimeAvailable(toLoc)
     }));
 
+    // Always append a walking option based on actual distance (5 km/h)
+    const walkMins = Math.round((distanceKm / 5) * 60);
+    routesWithAvailability.push({
+      route: 'Walking',
+      cost: 0,
+      time: walkMins,
+      reliability: 100,
+      notes: `${distanceKm.toFixed(1)} km · no waiting`,
+      service: 'walk',
+      limeUnavailable: false
+    });
+
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     displayRouteResults(fromLoc, toLoc, routesWithAvailability, time, dayNames[day], availableServices, distanceKm);
   }
@@ -1269,6 +1281,12 @@
     initDemoMode();
   }
   
+  // ── Service emoji helper ────────────────────────────────────────
+  function serviceEmoji(service) {
+    const map = { bus: '🚌', train: '🚆', lime: '🛴', walk: '🚶', cycling: '🚲', uber: '🚖', taxi: '🚖' };
+    return map[service] || '🚌';
+  }
+
   // ── Planner filter state ────────────────────────────────────────
   let _plannerFilter = null; // null | 'free' | 'cheapest' | 'fastest'
   let _lastPlannerSearch = null; // stores last search context for re-renders
@@ -1325,7 +1343,7 @@
               </div>
               ${arrival ? `
                 <div style="font-size: 12px; color: #003366; margin-top: 6px; font-weight: 500;">
-                  🚌 <strong>${formatTime(departure.hour, departure.min)}</strong> → <strong>${arrival.display}</strong>
+                  ${serviceEmoji(r.service)} <strong>${formatTime(departure.hour, departure.min)}</strong> → <strong>${arrival.display}</strong>
                   ${arrival.isRange ? '<span style="font-size: 10px; color: #999999;"> (est.)</span>' : ''}
                 </div>
               ` : ''}
