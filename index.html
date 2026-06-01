@@ -1249,29 +1249,31 @@
   }
 
   function initDemoMode() {
-    // Set current time
+    // Set current time and today's day
     const now = new Date();
     const hh = String(now.getHours()).padStart(2, '0');
     const mm = String(now.getMinutes()).padStart(2, '0');
     document.getElementById('journey-time').value = `${hh}:${mm}`;
-
-    // Set today's day
     document.getElementById('journey-day').value = String(now.getDay());
 
-    // Inject quick-switch pills below the search form, above #planner-results
-    const pillsHtml = `
-      <div id="demo-pills" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
-        ${DEMO_ROUTES.map(r => `
-          <button class="filter-pill demo-pill" data-from="${r.from}" data-to="${r.to}"
-            onclick="applyDemoRoute('${r.from}','${r.to}')">
-            ${r.label}
-          </button>`).join('')}
-      </div>`;
-    document.getElementById('planner-results').insertAdjacentHTML('beforebegin', pillsHtml);
-
-    // Activate Route Planner tab
+    // Activate Route Planner tab first so #planner-content is visible
     const plannerTab = document.querySelector('[data-route="planner"]');
     activateTab(plannerTab);
+
+    // Inject quick-switch pills after tab is active, using event listeners (not inline onclick)
+    const pillsContainer = document.createElement('div');
+    pillsContainer.id = 'demo-pills';
+    pillsContainer.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;';
+    DEMO_ROUTES.forEach(r => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-pill demo-pill';
+      btn.dataset.from = r.from;
+      btn.dataset.to = r.to;
+      btn.textContent = r.label;
+      btn.addEventListener('click', () => applyDemoRoute(r.from, r.to));
+      pillsContainer.appendChild(btn);
+    });
+    document.getElementById('planner-results').insertAdjacentElement('beforebegin', pillsContainer);
 
     // Pre-fill first route and run
     applyDemoRoute(DEMO_ROUTES[0].from, DEMO_ROUTES[0].to);
@@ -1288,8 +1290,8 @@
   }
 
   // ── Planner filter state ────────────────────────────────────────
-  let _plannerFilter = null; // null | 'free' | 'cheapest' | 'fastest'
-  let _lastPlannerSearch = null; // stores last search context for re-renders
+  var _plannerFilter = null; // null | 'free' | 'cheapest' | 'fastest'
+  var _lastPlannerSearch = null; // stores last search context for re-renders
 
   function setPlannerFilter(pill) {
     _plannerFilter = (_plannerFilter === pill) ? null : pill;
