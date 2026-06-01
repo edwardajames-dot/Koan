@@ -1214,6 +1214,24 @@
 
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     displayRouteResults(fromLoc, toLoc, routesWithAvailability, time, dayNames[day], availableServices, distanceKm);
+
+    // ── Silent demand logging — fire and forget, never blocks UI ──
+    try {
+      const topResult = routesWithAvailability[0] ? routesWithAvailability[0].service : null;
+      fetch(`${BACKEND_URL}/api/log-demand`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from:       fromLoc.name,
+          to:         toLoc.name,
+          day:        dayNames[day],
+          time:       time,
+          timestamp:  new Date().toISOString(),
+          routeCount: routesWithAvailability.length,
+          topResult:  topResult
+        })
+      }).catch(() => {});
+    } catch (_) {}
   }
 
   document.getElementById('search-route').addEventListener('click', runPlannerSearch);
