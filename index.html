@@ -18,8 +18,8 @@
     background: #F8F9FA;
     border: 1px solid #E8EBF0;
     border-radius: 16px;
-    padding: 24px;
-    margin: 1rem 0;
+    padding: 14px;
+    margin: 6px 0;
   }
   .status-item { font-size: 12px; color: #666666; margin: 8px 0; display: flex; align-items: center; gap: 8px; }
   .status-badge { width: 6px; height: 6px; border-radius: 50%; }
@@ -38,12 +38,12 @@
   .card-chevron { font-size: 10px; color: #BBBBBB; transition: transform 0.25s; flex-shrink: 0; line-height: 1; }
   .option-card.expanded .card-chevron { transform: rotate(180deg); }
   .option-card.best { background: linear-gradient(135deg, rgba(147,51,234,0.08) 0%, rgba(99,102,241,0.08) 100%); border: 1.5px solid rgba(147,51,234,0.3); }
-  .header { margin-bottom: 28px; }
-  .header h1 { font-size: 28px; font-weight: 700; line-height: 1.2; margin: 0; color: #003366; }
-  .header .label { font-size: 11px; font-family: 'Space Mono', monospace; color: #003366; letter-spacing: 2px; margin-bottom: 6px; font-weight: 700; }
+  .header { margin-bottom: 10px; }
+  .header h1 { font-size: 22px; font-weight: 700; line-height: 1.2; margin: 0; color: #003366; }
+  .header .label { font-size: 11px; font-family: 'Space Mono', monospace; color: #003366; letter-spacing: 2px; margin-bottom: 4px; font-weight: 700; }
   .header .accent { color: #9333EA; }
-  .header .tagline { font-size: 14px; color: #666666; font-weight: 500; margin-top: 4px; }
-  .tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+  .header .tagline { font-size: 13px; color: #666666; font-weight: 500; margin-top: 2px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 10px; }
   .tab { flex: 1; padding: 10px 8px; border-radius: 12px; border: 1px solid #E8EBF0; background: #FFFFFF; color: #999999; font-size: 10px; font-weight: 400; cursor: pointer; transition: all 0.15s; min-width: 0; overflow-wrap: break-word; }
   .tab.active { border: 1.5px solid #9333EA; background: rgba(147,51,234,0.08); color: #003366; font-weight: 600; }
   .tab-emoji { font-size: 20px; margin-bottom: 4px; }
@@ -91,7 +91,7 @@
 </style>
 </head>
 <body>
-<div id="main-wrapper" style="padding: 24px 20px 48px; max-width: 720px; margin: 0 auto;">
+<div id="main-wrapper" class="planner-active" style="padding: 12px 16px 48px; max-width: 720px; margin: 0 auto;">
   <div class="header">
     <div class="label">🚀 COMMUTE APP</div>
     <h1>Koan<span class="accent"></span></h1>
@@ -99,10 +99,7 @@
   </div>
 
   <div class="tabs">
-    <button class="tab active" data-route="morning"><div class="tab-emoji">☀️</div>Morning</button>
-    <button class="tab" data-route="nightout"><div class="tab-emoji">🌙</div>Night Out</button>
-    <button class="tab" data-route="latenight"><div class="tab-emoji">🌃</div>Late Night</button>
-    <button class="tab" data-route="planner"><div class="tab-emoji">🗺️</div>Route Planner</button>
+    <button class="tab active" data-route="planner"><div class="tab-emoji">🗺️</div>Route Planner</button>
     <button class="tab" data-route="map"><div class="tab-emoji">🏠</div>Live Map</button>
   </div>
 
@@ -157,15 +154,6 @@
 
 
   <div class="card main-card">
-    <div id="route-content">
-      <div style="font-size: 14px; margin-bottom: 12px; color: #003366; font-weight: 600;" id="route-title">☀️ Morning Commute</div>
-      <div id="route-from" style="font-size: 12px; color: #999999; margin-bottom: 8px;"></div>
-      <div id="options-container" style="display: flex; flex-direction: column; gap: 8px;"></div>
-      <div class="insight">
-        <strong>💡 Insight:</strong> <span id="insight-text">Loading transit options...</span>
-      </div>
-    </div>
-    
     <div id="map-content" style="display: none;">
       <div style="font-size: 14px; margin-bottom: 12px; color: #003366; font-weight: 600;">🏠 Student Accommodation Near UoW</div>
       <div style="font-size: 12px; color: #999999; margin-bottom: 16px;">Live accommodation options ranked by value (price + commute cost)</div>
@@ -195,27 +183,24 @@
       </div>
     </div>
     
-    <div id="planner-content" style="display: none;">
-      <div style="font-size: 14px; margin-bottom: 12px; color: #003366; font-weight: 600;">🗺️ Route Planner</div>
-      <div style="font-size: 12px; color: #999999; margin-bottom: 16px;">Find the best journey between two points in Coventry & Warwickshire</div>
-      
-      <div style="background: #F8F9FA; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-        <div style="margin-bottom: 12px; position: relative;">
-          <label style="font-size: 12px; color: #003366; font-weight: 600; display: block; margin-bottom: 6px;">📍 From (location or postcode)</label>
-          <input type="text" id="from-location" placeholder="e.g., Coventry City Centre or CV1" style="width: 100%; padding: 10px; border: 1px solid #E8EBF0; border-radius: 6px; background: #FFFFFF; color: #003366; font-size: 13px;">
-          <div id="from-suggestions" style="display: none; position: absolute; background: #FFFFFF; border: 1px solid #E8EBF0; border-radius: 6px; max-height: 150px; overflow-y: auto; width: calc(100% - 32px); margin-top: 2px; z-index: 10;"></div>
+    <div id="planner-content">
+      <div style="background: #F8F9FA; border-radius: 12px; padding: 12px; margin-bottom: 10px;">
+        <div style="margin-bottom: 8px; position: relative;">
+          <label style="font-size: 12px; color: #003366; font-weight: 600; display: block; margin-bottom: 4px;">📍 From</label>
+          <input type="text" id="from-location" placeholder="e.g., Coventry City Centre or CV1" style="width: 100%; padding: 8px 10px; border: 1px solid #E8EBF0; border-radius: 6px; background: #FFFFFF; color: #003366; font-size: 13px;">
+          <div id="from-suggestions" style="display: none; position: absolute; background: #FFFFFF; border: 1px solid #E8EBF0; border-radius: 6px; max-height: 150px; overflow-y: auto; width: calc(100% - 24px); margin-top: 2px; z-index: 10;"></div>
         </div>
-        
-        <div style="margin-bottom: 12px; position: relative;">
-          <label style="font-size: 12px; color: #003366; font-weight: 600; display: block; margin-bottom: 6px;">📍 To (location or postcode)</label>
-          <input type="text" id="to-location" placeholder="e.g., University of Warwick or CV4" style="width: 100%; padding: 10px; border: 1px solid #E8EBF0; border-radius: 6px; background: #FFFFFF; color: #003366; font-size: 13px;">
-          <div id="to-suggestions" style="display: none; position: absolute; background: #FFFFFF; border: 1px solid #E8EBF0; border-radius: 6px; max-height: 150px; overflow-y: auto; width: calc(100% - 32px); margin-top: 2px; z-index: 10;"></div>
+
+        <div style="margin-bottom: 8px; position: relative;">
+          <label style="font-size: 12px; color: #003366; font-weight: 600; display: block; margin-bottom: 4px;">📍 To</label>
+          <input type="text" id="to-location" placeholder="e.g., University of Warwick or CV4" style="width: 100%; padding: 8px 10px; border: 1px solid #E8EBF0; border-radius: 6px; background: #FFFFFF; color: #003366; font-size: 13px;">
+          <div id="to-suggestions" style="display: none; position: absolute; background: #FFFFFF; border: 1px solid #E8EBF0; border-radius: 6px; max-height: 150px; overflow-y: auto; width: calc(100% - 24px); margin-top: 2px; z-index: 10;"></div>
         </div>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
           <div>
-            <label style="font-size: 12px; color: #003366; font-weight: 600; display: block; margin-bottom: 6px;">📅 Day</label>
-            <select id="journey-day" style="width: 100%; padding: 10px; border: 1px solid #E8EBF0; border-radius: 6px; background: #FFFFFF; color: #003366; font-size: 13px;">
+            <label style="font-size: 12px; color: #003366; font-weight: 600; display: block; margin-bottom: 4px;">📅 Day</label>
+            <select id="journey-day" style="width: 100%; padding: 8px 10px; border: 1px solid #E8EBF0; border-radius: 6px; background: #FFFFFF; color: #003366; font-size: 13px;">
               <option value="0">Sunday</option>
               <option value="1">Monday</option>
               <option value="2">Tuesday</option>
@@ -227,11 +212,11 @@
           </div>
           
           <div>
-            <label style="font-size: 12px; color: #003366; font-weight: 600; display: block; margin-bottom: 6px;">🕐 Time</label>
-            <input type="time" id="journey-time" style="width: 100%; padding: 10px; border: 1px solid #E8EBF0; border-radius: 6px; background: #FFFFFF; color: #003366; font-size: 13px;" value="09:00">
+            <label style="font-size: 12px; color: #003366; font-weight: 600; display: block; margin-bottom: 4px;">🕐 Time</label>
+            <input type="time" id="journey-time" style="width: 100%; padding: 8px 10px; border: 1px solid #E8EBF0; border-radius: 6px; background: #FFFFFF; color: #003366; font-size: 13px;" value="09:00">
           </div>
         </div>
-        
+
         <button id="search-route" style="width: 100%; padding: 10px; background: linear-gradient(135deg, #9333EA, #6B21A8); color: #FFFFFF; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">Search Routes</button>
       </div>
       
@@ -413,7 +398,7 @@
   };
 
   let state = {
-    activeRoute: "morning",
+    activeRoute: "planner",
     safeMode: false,
     autoSafeMode: false,
     groupSize: 1,
@@ -1001,7 +986,6 @@
     btn.classList.add("active");
     state.activeRoute = route;
 
-    document.getElementById("route-content").style.display = "none";
     document.getElementById("map-content").style.display = "none";
     document.getElementById("planner-content").style.display = "none";
 
@@ -1014,16 +998,12 @@
         setTimeout(() => initMap(), 100);
         renderAccommodations();
       });
-    } else if (route === "planner") {
+    } else {
+      // Default: Route Planner
       wrapper.classList.add('planner-active');
-      // Collapse Safe Return and Wallet so the form is immediately visible
       document.getElementById('safe-return-section').classList.remove('expanded');
       document.querySelector('.wallet-card').classList.remove('expanded');
       document.getElementById("planner-content").style.display = "block";
-    } else {
-      wrapper.classList.remove('planner-active');
-      document.getElementById("route-content").style.display = "block";
-      loadApisOnDemand();
     }
 
     render();
@@ -1115,9 +1095,11 @@
     state.safeMode = true;
     state.autoSafeMode = true;
     document.getElementById('safeMode').classList.add('active');
-    // Expand Safe Return card so the late-night banner is visible
     document.getElementById('safe-return-section').classList.add('expanded');
   }
+  // Route Planner is the default tab — ensure correct DOM state
+  document.getElementById('planner-content').style.display = 'block';
+  document.getElementById('map-content').style.display = 'none';
   render();
 
   // Map tab handling (integrated with main tab listener above)
