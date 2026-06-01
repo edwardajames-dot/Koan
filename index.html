@@ -70,6 +70,15 @@
   .share-btn { display: block; width: 100%; padding: 8px; margin-top: 8px; background: none; border: 1px solid #E8EBF0; border-radius: 8px; color: #666666; font-size: 12px; font-weight: 500; cursor: pointer; text-align: center; }
   #share-toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: #1E293B; color: #FFFFFF; font-size: 12px; padding: 8px 16px; border-radius: 20px; pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 9999; white-space: nowrap; }
   .card-unavailable { opacity: 0.45; }
+  .report-btn { display: block; width: 100%; margin-top: 14px; padding: 11px; background: #FFFFFF; border: 1.5px solid #9333EA; border-radius: 10px; color: #9333EA; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; }
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; display: flex; align-items: flex-end; justify-content: center; }
+  .modal-sheet { background: #FFFFFF; border-radius: 20px 20px 0 0; padding: 24px 20px 36px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
+  .modal-sheet h2 { font-size: 17px; font-weight: 700; color: #003366; margin-bottom: 4px; }
+  .modal-sheet p  { font-size: 13px; color: #666666; margin-bottom: 16px; }
+  .modal-field { width: 100%; padding: 10px; border: 1px solid #E8EBF0; border-radius: 8px; font-size: 13px; color: #003366; background: #FFFFFF; margin-bottom: 12px; font-family: inherit; }
+  .modal-field:read-only { background: #F8F9FA; color: #999999; }
+  .modal-submit { width: 100%; padding: 12px; background: linear-gradient(135deg, #9333EA, #6B21A8); color: #FFFFFF; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
+  .modal-cancel { width: 100%; padding: 10px; background: none; border: none; color: #999999; font-size: 13px; cursor: pointer; }
 
   /* Collapsible cards (Safe Return, Wallet) */
   .collapsible-card .collapsible-body { overflow: hidden; max-height: 0; transition: max-height 0.3s ease, padding 0.3s ease; padding-top: 0; }
@@ -260,6 +269,27 @@
 </div>
 
 <div id="share-toast">Sharing coming soon 📲</div>
+<div id="gap-toast" style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1E293B;color:#FFFFFF;font-size:12px;padding:10px 18px;border-radius:20px;pointer-events:none;opacity:0;transition:opacity 0.2s;z-index:9999;white-space:nowrap;max-width:90vw;text-align:center;"></div>
+
+<div id="gap-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)closeGapModal()">
+  <div class="modal-sheet">
+    <h2>Report a Gap</h2>
+    <p>Help us improve transport in Warwickshire</p>
+    <input id="gap-route" class="modal-field" type="text" readonly>
+    <select id="gap-issue" class="modal-field">
+      <option value="No service on this route">No service on this route</option>
+      <option value="Service too infrequent">Service too infrequent</option>
+      <option value="Last service too early">Last service too early</option>
+      <option value="Too expensive">Too expensive</option>
+      <option value="Not safe enough">Not safe enough</option>
+      <option value="Missing stop near me">Missing stop near me</option>
+      <option value="Other">Other</option>
+    </select>
+    <textarea id="gap-detail" class="modal-field" rows="3" placeholder="Tell us more (optional)" style="resize:vertical;"></textarea>
+    <button class="modal-submit" onclick="submitGapReport()">Submit Report</button>
+    <button class="modal-cancel" onclick="closeGapModal()">Cancel</button>
+  </div>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
   // ── Share toast ─────────────────────────────────────────────────
@@ -1473,9 +1503,58 @@
         <strong>💡 Available services:</strong> ${availableServices.join(' · ')}
         ${routes.some(r => r.limeUnavailable) ? '<br><strong>ℹ️ Lime</strong> only operates in Coventry (CV1-6) & University of Warwick campus' : ''}
       </div>
+
+      <button class="report-btn" onclick="openGapModal('${from.name.replace(/'/g,"\\'")}','${to.name.replace(/'/g,"\\'")}')">🚨 Report a Gap in the Network</button>
     `;
 
     renderPlannerCards();
+  }
+
+  // ── Gap reporting ───────────────────────────────────────────────
+  let _gapFrom = '', _gapTo = '';
+
+  function openGapModal(from, to) {
+    _gapFrom = from;
+    _gapTo   = to;
+    document.getElementById('gap-route').value = `${from} → ${to}`;
+    document.getElementById('gap-issue').selectedIndex = 0;
+    document.getElementById('gap-detail').value = '';
+    document.getElementById('gap-modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeGapModal() {
+    document.getElementById('gap-modal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  let _gapToastTimer = null;
+  function showGapToast(msg) {
+    const el = document.getElementById('gap-toast');
+    el.textContent = msg;
+    el.style.opacity = '1';
+    clearTimeout(_gapToastTimer);
+    _gapToastTimer = setTimeout(() => { el.style.opacity = '0'; }, 3500);
+  }
+
+  function submitGapReport() {
+    const issue  = document.getElementById('gap-issue').value;
+    const detail = document.getElementById('gap-detail').value.trim() || null;
+    closeGapModal();
+    showGapToast('Thanks — your report helps improve Warwickshire transport 🙏');
+    try {
+      fetch(`${BACKEND_URL}/api/log-gap`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from:      _gapFrom,
+          to:        _gapTo,
+          issue:     issue,
+          detail:    detail,
+          timestamp: new Date().toISOString()
+        })
+      }).catch(() => {});
+    } catch (_) {}
   }
 
   // Filter event listeners
