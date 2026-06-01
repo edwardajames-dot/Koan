@@ -427,8 +427,12 @@
       lime:    { range: '£1 unlock + £0.19/min · typical £3–5', note: null },
       uber:    { range: '£8–14 estimated',              note: null },
       taxi:    { range: '£8–14 estimated',              note: null },
-      walk:    { range: '£0',                           note: null },
-      cycling: { range: '£0',                           note: null }
+      walk:          { range: '£0',                                   note: null },
+      cycling:       { range: '£0',                                   note: null },
+      'lime-scooter':{ range: '£1 unlock + £0.25/min · typical £3–5', note: null },
+      hiyacar:       { range: '~£6.50/hr (car club)',                  note: 'Book via HiyaCar app' },
+      indiogo:       { range: '£2.50 per journey',                     note: 'Dial-a-ride service' },
+      drt:           { range: '£2.00 per journey',                     note: 'On-demand bus' }
     };
     return estimates[service] || { range: '—', note: null };
   }
@@ -1196,12 +1200,12 @@
 
     if (allRoutes.length === 0) {
       allRoutes = [
-        { route: 'Bus',       cost: 2.4,                          time: calculateJourneyTime(distanceKm, 'bus'),  reliability: 88, notes: 'Via local bus network',  service: 'bus'  },
-        { route: 'Lime Bike', cost: Math.round(distanceKm * 0.5), time: calculateJourneyTime(distanceKm, 'lime'), reliability: 85, notes: 'Cycle if available',       service: 'lime' },
-        { route: 'Uber',      cost: Math.round(8 + distanceKm * 1.5), time: calculateJourneyTime(distanceKm, 'uber'), reliability: 92, notes: 'Door-to-door service', service: 'uber' }
+        { route: 'Bus',       cost: 2.4,                              time: calculateJourneyTime(distanceKm, 'bus'),  reliability: 88, notes: 'Via local bus network',  service: 'bus',  co2: 0.7 },
+        { route: 'Lime Bike', cost: Math.round(distanceKm * 0.5),     time: calculateJourneyTime(distanceKm, 'lime'), reliability: 85, notes: 'Cycle if available',      service: 'lime', co2: 0.0 },
+        { route: 'Uber',      cost: Math.round(8 + distanceKm * 1.5), time: calculateJourneyTime(distanceKm, 'uber'), reliability: 92, notes: 'Door-to-door service',    service: 'uber', co2: 1.4 }
       ];
     } else {
-      allRoutes = allRoutes.map(r => ({ ...r, time: calculateJourneyTime(distanceKm, r.service || 'bus') }));
+      allRoutes = allRoutes.map(r => ({ ...r, time: calculateJourneyTime(distanceKm, r.service || 'bus'), co2: co2ForService(r.service) }));
     }
 
     const availableRoutes = allRoutes.filter(r =>
@@ -1213,17 +1217,21 @@
       limeUnavailable: r.service === 'lime' && !isLimeAvailable(toLoc)
     }));
 
-    // Always append a walking option based on actual distance (5 km/h)
+    // Always append walking (5 km/h)
     const walkMins = Math.round((distanceKm / 5) * 60);
     routesWithAvailability.push({
-      route: 'Walking',
-      cost: 0,
-      time: walkMins,
-      reliability: 100,
-      notes: `${distanceKm.toFixed(1)} km · no waiting`,
-      service: 'walk',
-      limeUnavailable: false
+      route: 'Walking', cost: 0, time: walkMins, reliability: 100,
+      notes: `${distanceKm.toFixed(1)} km · no waiting`, service: 'walk', co2: 0.0, limeUnavailable: false
     });
+
+    // Always append mock/new-service routes (hardcoded plausible values, scaled to distance)
+    const limeUnavail = !isLimeAvailable(toLoc);
+    routesWithAvailability.push(
+      { route: 'Lime Scooter',  cost: 3.20, time: Math.round(distanceKm / 25 * 60) + 2, reliability: 85, notes: 'Requires Lime app and helmet',          service: 'lime-scooter', co2: 0.2, limeUnavailable: limeUnavail },
+      { route: 'HiyaCar',       cost: 6.50, time: Math.round(distanceKm / 35 * 60) + 5, reliability: 82, notes: 'Car club — book via HiyaCar app',        service: 'hiyacar',      co2: 1.2, limeUnavailable: false },
+      { route: 'IndieGo',       cost: 2.50, time: Math.round(distanceKm / 24 * 60) + 8, reliability: 80, notes: 'Dial-a-ride — book 30 min ahead',        service: 'indiogo',      co2: 0.3, limeUnavailable: false },
+      { route: 'Coventry DRT',  cost: 2.00, time: Math.round(distanceKm / 22 * 60) + 8, reliability: 78, notes: 'On-demand bus — Coventry zones only',    service: 'drt',          co2: 0.3, limeUnavailable: false }
+    );
 
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     displayRouteResults(fromLoc, toLoc, routesWithAvailability, time, dayNames[day], availableServices, distanceKm);
@@ -1285,8 +1293,13 @@
   
   // ── Service emoji helper ────────────────────────────────────────
   function serviceEmoji(service) {
-    const map = { bus: '🚌', train: '🚆', lime: '🛴', walk: '🚶', cycling: '🚲', uber: '🚖', taxi: '🚖' };
+    const map = { bus: '🚌', train: '🚆', lime: '🚲', 'lime-scooter': '🛴', walk: '🚶', cycling: '🚲', uber: '🚖', taxi: '🚖', hiyacar: '🚗', indiogo: '🚐', drt: '🚌' };
     return map[service] || '🚌';
+  }
+
+  function co2ForService(service) {
+    const map = { bus: 0.7, train: 0.6, lime: 0.0, 'lime-scooter': 0.2, walk: 0.0, cycling: 0.0, uber: 1.4, taxi: 1.4, hiyacar: 1.2, indiogo: 0.3, drt: 0.3 };
+    return map[service] !== undefined ? map[service] : 0.5;
   }
 
   // ── Planner filter state ────────────────────────────────────────
@@ -1307,18 +1320,34 @@
     const cardsDiv = document.getElementById('planner-cards');
     if (!cardsDiv) return;
 
+    const SERVICE_DEFAULT_ORDER = ['walk', 'lime', 'lime-scooter', 'bus', 'train', 'indiogo', 'drt', 'hiyacar', 'taxi', 'uber'];
     let routes = [...s.routes];
 
-    if (_plannerFilter === 'free') {
-      routes = routes.filter(r => r.cost === 0);
-    } else if (_plannerFilter === 'cheapest') {
-      routes = routes.slice().sort((a, b) => a.cost - b.cost);
+    if (_plannerFilter === 'greenest') {
+      routes = routes.slice().sort((a, b) => (a.co2 || 0) - (b.co2 || 0));
     } else if (_plannerFilter === 'fastest') {
       routes = routes.slice().sort((a, b) => a.time - b.time);
+    } else if (_plannerFilter === 'cheapest') {
+      routes = routes.slice().sort((a, b) => {
+        if (a.cost === 0 && b.cost !== 0) return -1;
+        if (b.cost === 0 && a.cost !== 0) return 1;
+        return a.cost - b.cost;
+      });
+    } else {
+      // Default: low-carbon-first, walk first if ≤ 15 min
+      routes = routes.slice().sort((a, b) => {
+        const aWalk = a.service === 'walk' && a.time <= 15;
+        const bWalk = b.service === 'walk' && b.time <= 15;
+        if (aWalk && !bWalk) return -1;
+        if (bWalk && !aWalk) return 1;
+        const aIdx = SERVICE_DEFAULT_ORDER.indexOf(a.service);
+        const bIdx = SERVICE_DEFAULT_ORDER.indexOf(b.service);
+        return (aIdx === -1 ? 99 : aIdx) - (bIdx === -1 ? 99 : bIdx);
+      });
     }
 
     if (routes.length === 0) {
-      cardsDiv.innerHTML = `<div style="padding: 20px; text-align: center; color: #999999; background: #F8F9FA; border-radius: 8px;">No ${_plannerFilter === 'free' ? 'free' : ''} routes match this filter</div>`;
+      cardsDiv.innerHTML = `<div style="padding: 20px; text-align: center; color: #999999; background: #F8F9FA; border-radius: 8px;">No routes match this filter</div>`;
       return;
     }
 
@@ -1343,6 +1372,7 @@
                 <span style="font-size: 13px; font-weight: 600; color: #003366;">${estimate.range}</span>
                 ${estimate.note ? `<span style="font-size: 11px; color: #6B21A8;">${estimate.note}</span>` : ''}
               </div>
+              <div style="margin-top: 4px; font-size: 11px; color: #16A34A;">🌱 ${r.co2 !== undefined ? r.co2.toFixed(1) + ' kg CO₂' : '—'}</div>
               ${arrival ? `
                 <div style="font-size: 12px; color: #003366; margin-top: 6px; font-weight: 500;">
                   ${serviceEmoji(r.service)} <strong>${formatTime(departure.hour, departure.min)}</strong> → <strong>${arrival.display}</strong>
@@ -1386,8 +1416,6 @@
       `;
     }
 
-    const hasFreeRoute = routes.some(r => r.cost === 0);
-
     resultsDiv.innerHTML = `
       <div style="margin-bottom: 12px; padding: 12px; background: rgba(147,51,234,0.08); border-radius: 8px; border-left: 3px solid #9333EA;">
         <div style="font-size: 13px; color: #003366; font-weight: 600;">${from.name} → ${to.name}</div>
@@ -1398,9 +1426,9 @@
 
       ${routes.length > 0 ? `
         <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-          ${hasFreeRoute ? `<button class="filter-pill" data-filter="free" onclick="setPlannerFilter('free')">🆓 Free</button>` : ''}
-          <button class="filter-pill" data-filter="cheapest" onclick="setPlannerFilter('cheapest')">💰 Cheapest</button>
-          <button class="filter-pill" data-filter="fastest" onclick="setPlannerFilter('fastest')">⚡ Fastest</button>
+          <button class="filter-pill" data-filter="greenest" onclick="setPlannerFilter('greenest')">🌱 Greenest</button>
+          <button class="filter-pill" data-filter="fastest"  onclick="setPlannerFilter('fastest')">⚡ Fastest</button>
+          <button class="filter-pill" data-filter="cheapest" onclick="setPlannerFilter('cheapest')">💸 Cheapest</button>
         </div>
       ` : ''}
 
