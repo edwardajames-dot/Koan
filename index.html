@@ -72,6 +72,7 @@
   .filter-pill.active { border-color: #9333EA; background: rgba(147,51,234,0.10); color: #6B21A8; font-weight: 600; }
   .share-btn { display: block; width: 100%; padding: 8px; margin-top: 8px; background: none; border: 1px solid #E8EBF0; border-radius: 8px; color: #666666; font-size: 12px; font-weight: 500; cursor: pointer; text-align: center; }
   #share-toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: #1E293B; color: #FFFFFF; font-size: 12px; padding: 8px 16px; border-radius: 20px; pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 9999; white-space: nowrap; }
+  .card-unavailable { opacity: 0.45; }
 
   /* Collapsible cards (Safe Return, Wallet) */
   .collapsible-card .collapsible-body { overflow: hidden; max-height: 0; transition: max-height 0.3s ease, padding 0.3s ease; padding-top: 0; }
@@ -1225,6 +1226,7 @@
     });
 
     // Always append mock/new-service routes (hardcoded plausible values, scaled to distance)
+    // Service area config — both from AND to must be in the list; null = always available
     const limeUnavail = !isLimeAvailable(toLoc);
     routesWithAvailability.push(
       { route: 'Lime Scooter',  cost: 3.20, time: Math.round(distanceKm / 25 * 60) + 2, reliability: 85, notes: 'Requires Lime app and helmet',          service: 'lime-scooter', co2: 0.2, limeUnavailable: limeUnavail },
@@ -1291,6 +1293,36 @@
     initDemoMode();
   }
   
+  // ── Service area config ─────────────────────────────────────────
+  const SERVICE_AREAS = {
+    'lime-scooter': ['University of Warwick', 'Coventry Train Station', 'Earlsdon, Coventry'],
+    'lime-bike':    ['University of Warwick', 'Coventry Train Station', 'Earlsdon, Coventry'],
+    'indiego':      ['Kenilworth Town Centre', 'University of Warwick'],
+    'coventry-drt': ['Coventry Train Station', 'Earlsdon, Coventry'],
+    'hiyacar':      null  // available everywhere, never greyed
+  };
+
+  // Map route service keys → SERVICE_AREAS keys (they differ for legacy reasons)
+  // Note: route data uses 'indiogo' (typo), SERVICE_AREAS key is 'indiego'
+  function serviceToAreaKey(service) {
+    const map = {
+      'lime':         'lime-bike',
+      'lime-scooter': 'lime-scooter',
+      'indiogo':      'indiego',
+      'drt':          'coventry-drt',
+      'hiyacar':      'hiyacar'
+    };
+    return map[service] || service;
+  }
+
+  function isInServiceArea(service, fromName, toName) {
+    const key = serviceToAreaKey(service);
+    if (!(key in SERVICE_AREAS)) return true; // unknown service = no restriction
+    const areas = SERVICE_AREAS[key];
+    if (areas === null) return true;          // null = available everywhere
+    return areas.includes(fromName) && areas.includes(toName);
+  }
+
   // ── Service emoji helper ────────────────────────────────────────
   function serviceEmoji(service) {
     const map = { bus: '🚌', train: '🚆', lime: '🚲', 'lime-scooter': '🛴', walk: '🚶', cycling: '🚲', uber: '🚖', taxi: '🚖', hiyacar: '🚗', indiogo: '🚐', drt: '🚌' };
@@ -1351,14 +1383,22 @@
       return;
     }
 
+    // Split into in-area (available) and out-of-area — out-of-area always goes last
+    const fromName = s.fromName || '';
+    const toName   = s.toName   || '';
+    const inArea    = routes.filter(r =>  isInServiceArea(r.service, fromName, toName));
+    const outOfArea = routes.filter(r => !isInServiceArea(r.service, fromName, toName));
+    routes = [...inArea, ...outOfArea];
+
     const [userHour, userMin] = s.time.split(':').map(Number);
     cardsDiv.innerHTML = routes.map((r, idx) => {
       const isUnavailable = r.limeUnavailable;
+      const isOutOfArea   = !isInServiceArea(r.service, fromName, toName);
       const departure = getNextDeparture(r.service || 'bus', userHour, userMin);
       const arrival = departure ? getArrivalTime(departure.hour, departure.min, r.time, departure.variance) : null;
       const estimate = getCostEstimate(r.service || 'bus');
       return `
-        <div class="option-card" style="${isUnavailable ? 'opacity: 0.5; background: #F3F4F6;' : ''}">
+        <div class="option-card${isOutOfArea ? ' card-unavailable' : ''}" style="${isUnavailable ? 'opacity: 0.5; background: #F3F4F6;' : ''}">
           ${getReliabilityWarningHTML(r.route, r.service || 'bus')}
           <div class="card-summary">
             <div style="flex: 1; min-width: 0;">
@@ -1366,7 +1406,7 @@
                 ${idx + 1}. ${r.route}
                 ${isUnavailable ? '<span style="font-size: 10px; color: #999999; margin-left: 8px;"> (not available in this area)</span>' : ''}
               </div>
-              <div style="font-size: 11px; color: #999999; margin-top: 2px;">${r.notes}</div>
+              <div style="font-size: 11px; color: #999999; margin-top: 2px;">${isOutOfArea ? '⚠️ Not available on this route' : r.notes}</div>
               <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                 <span style="font-size: 10px; background: rgba(22,163,74,0.12); color: #16A34A; border-radius: 4px; padding: 1px 5px; font-weight: 700;">£</span>
                 <span style="font-size: 13px; font-weight: 600; color: #003366;">${estimate.range}</span>
@@ -1397,7 +1437,7 @@
 
     // Store search context for filter re-renders; reset active filter on new search
     _plannerFilter = null;
-    _lastPlannerSearch = { routes, time, dayName, availableServices };
+    _lastPlannerSearch = { routes, time, dayName, availableServices, fromName: from.name, toName: to.name };
 
     let warningHtml = '';
     if (routes.length === 0) {
