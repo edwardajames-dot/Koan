@@ -70,6 +70,9 @@
   .share-btn { display: block; width: 100%; padding: 8px; margin-top: 8px; background: none; border: 1px solid #E8EBF0; border-radius: 8px; color: #666666; font-size: 12px; font-weight: 500; cursor: pointer; text-align: center; }
   #share-toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: #1E293B; color: #FFFFFF; font-size: 12px; padding: 8px 16px; border-radius: 20px; pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 9999; white-space: nowrap; }
   .card-unavailable { opacity: 0.45; }
+  .accordion-body { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
+  .accordion-sub { margin-left: 8px; border-left: 2px solid #E8EBF0; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; font-size: 0.9em; }
+  .accordion-sub.unavailable { opacity: 0.45; }
   .report-btn { display: block; width: 100%; margin-top: 14px; padding: 11px; background: #FFFFFF; border: 1.5px solid #9333EA; border-radius: 10px; color: #9333EA; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; }
   .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; display: flex; align-items: flex-end; justify-content: center; }
   .modal-sheet { background: #FFFFFF; border-radius: 20px 20px 0 0; padding: 24px 20px 36px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
@@ -1174,6 +1177,22 @@
     card.classList.toggle('expanded');
   }
 
+  function toggleAccordion(id) {
+    const body  = document.getElementById('accordion-body-' + id);
+    const label = document.getElementById('accordion-label-' + id);
+    if (!body) return;
+    const isOpen = body.dataset.open === 'true';
+    if (isOpen) {
+      body.style.maxHeight = '0';
+      body.dataset.open = 'false';
+      if (label) label.textContent = 'Show options ▾';
+    } else {
+      body.style.maxHeight = body.scrollHeight + 'px';
+      body.dataset.open = 'true';
+      if (label) label.textContent = 'Hide options ▴';
+    }
+  }
+
   function toggleDataSources() {
     const el = document.getElementById('data-sources-expanded');
     el.style.display = el.style.display === 'none' ? 'block' : 'none';
@@ -1303,14 +1322,22 @@
       allRoutes = allRoutes.map(r => ({ ...r, time: r.time || calculateJourneyTime(distanceKm, r.service || 'bus'), co2: co2ForService(r.service) }));
     }
 
+    // Extract lime/uber values before filtering — used in accordion sub-options
+    const _limeEntry = allRoutes.find(r => r.service === 'lime');
+    const _uberEntry = allRoutes.find(r => r.service === 'uber');
+    const limeTime = _limeEntry ? (_limeEntry.time || calculateJourneyTime(distanceKm, 'lime')) : calculateJourneyTime(distanceKm, 'lime');
+    const limeCost = _limeEntry ? _limeEntry.cost : Math.round(distanceKm * 0.5 * 100) / 100;
+    const uberTime = _uberEntry ? (_uberEntry.time || calculateJourneyTime(distanceKm, 'uber')) : calculateJourneyTime(distanceKm, 'uber');
+    const uberCost = _uberEntry ? _uberEntry.cost : Math.round((8 + distanceKm * 1.5) * 100) / 100;
+
     const availableRoutes = allRoutes.filter(r =>
       isServiceAvailable(r.service || 'bus', parseInt(time.split(':')[0]), day)
     );
 
-    const routesWithAvailability = availableRoutes.map(r => ({
-      ...r,
-      limeUnavailable: r.service === 'lime' && !isLimeAvailable(toLoc)
-    }));
+    // Exclude lime/uber/taxi — they're consolidated into accordion cards below
+    const routesWithAvailability = availableRoutes
+      .filter(r => !['lime', 'uber', 'taxi'].includes(r.service))
+      .map(r => ({ ...r, limeUnavailable: false }));
 
     // Always append walking (5 km/h)
     const walkMins = Math.round((distanceKm / 5) * 60);
@@ -1319,26 +1346,47 @@
       notes: `${distanceKm.toFixed(1)} km · no waiting`, service: 'walk', co2: 0.0, limeUnavailable: false
     });
 
-    // Mock/new-service routes — use corridor-specific times where available
-    const limeUnavail = !isLimeAvailable(toLoc);
+    // Non-accordion mock routes (HiyaCar, IndieGo, Coventry DRT)
     const _mt = MOCK_TIME_OVERRIDES[key] || {};
     routesWithAvailability.push(
-      { route: 'Lime Scooter', cost: 3.20, time: _mt['lime-scooter'] || Math.round(distanceKm / 25 * 60) + 2, reliability: 85, notes: 'Requires Lime app and helmet',       service: 'lime-scooter', co2: 0.2, limeUnavailable: limeUnavail },
-      { route: 'HiyaCar',      cost: 6.50, time: _mt.hiyacar         || Math.round(distanceKm / 35 * 60) + 5, reliability: 82, notes: 'Car club — book via HiyaCar app',    service: 'hiyacar',      co2: 1.2, limeUnavailable: false, sortPenalty: 2 },
-      { route: 'IndieGo',      cost: 2.50, time: _mt.indiogo         || Math.round(distanceKm / 24 * 60) + 8, reliability: 80, notes: 'Dial-a-ride — book 30 min ahead',    service: 'indiogo',      co2: 0.3, limeUnavailable: false },
-      { route: 'Coventry DRT', cost: 2.00, time: _mt.drt             || Math.round(distanceKm / 22 * 60) + 8, reliability: 78, notes: 'On-demand bus — Coventry zones only',service: 'drt',          co2: 0.3, limeUnavailable: false }
+      { route: 'HiyaCar',      cost: 6.50, time: _mt.hiyacar  || Math.round(distanceKm / 35 * 60) + 5, reliability: 82, notes: 'Car club — book via HiyaCar app',     service: 'hiyacar', co2: 1.2, limeUnavailable: false, sortPenalty: 2 },
+      { route: 'IndieGo',      cost: 2.50, time: _mt.indiogo  || Math.round(distanceKm / 24 * 60) + 8, reliability: 80, notes: 'Dial-a-ride — book 30 min ahead',     service: 'indiogo', co2: 0.3, limeUnavailable: false },
+      { route: 'Coventry DRT', cost: 2.00, time: _mt.drt      || Math.round(distanceKm / 22 * 60) + 8, reliability: 78, notes: 'On-demand bus — Coventry zones only', service: 'drt',     co2: 0.3, limeUnavailable: false }
     );
-    // BlaBlaCar only makes sense for longer journeys (>15 km)
-    if (distanceKm > 15) {
-      routesWithAvailability.push({
-        route: 'BlaBlaCar',
-        cost: Math.round(distanceKm * 0.08 * 100) / 100,
-        time: Math.round(distanceKm / 40 * 60) + 5,
-        reliability: 78,
-        notes: 'Shared ride — book via BlaBlaCar app',
-        service: 'blablacar', co2: 0.6, limeUnavailable: false
-      });
-    }
+
+    // ── Accordion: Bikes & Scooters ───────────────────────────────
+    const limeAvailHere = isLimeAvailable(toLoc);
+    const scooterTime   = _mt['lime-scooter'] || Math.round(distanceKm / 25 * 60) + 2;
+    const isKenilworthRoute = ['kenilworth'].includes(fromLoc.id) || ['kenilworth'].includes(toLoc.id);
+    routesWithAvailability.push({
+      type: 'accordion', accordionId: 'bikes-scooters',
+      route: 'Bikes & Scooters',
+      headlineNote: `Free · ~${limeTime} min`,
+      service: 'cycling', cost: 0, time: limeTime, co2: 0.0, reliability: 95, limeUnavailable: false,
+      subOptions: [
+        { icon: '🚴', name: 'Personal bike',  cost: 0,     time: limeTime,    co2: 0.0, notes: 'Your own bike — no cost, no app needed',        service: 'cycling',      available: true },
+        { icon: '🚲', name: 'Lime Bike',       cost: limeCost, time: limeTime, co2: 0.0, notes: 'Live availability · Lime app',                  service: 'lime',         available: limeAvailHere },
+        { icon: '🛴', name: 'Lime Scooter',    cost: 3.20,  time: scooterTime, co2: 0.2, notes: 'Requires Lime app and helmet',                  service: 'lime-scooter', available: limeAvailHere },
+        ...(isKenilworthRoute ? [{ icon: '🚲', name: 'Brompton hire', cost: 5.00, time: limeTime, co2: 0.0, notes: 'Hire from Kenilworth Station · £5/day', service: 'cycling', available: true }] : [])
+      ]
+    });
+
+    // ── Accordion: Taxi & Rideshare ───────────────────────────────
+    const boltCost = Math.round(uberCost * 0.9 * 100) / 100;
+    const blaCost  = Math.round(distanceKm * 0.08 * 100) / 100;
+    const blaTime  = Math.round(distanceKm / 40 * 60) + 5;
+    routesWithAvailability.push({
+      type: 'accordion', accordionId: 'taxi-rideshare',
+      route: 'Taxi & Rideshare',
+      headlineNote: `from £${uberCost.toFixed(2)} · ${uberTime} min`,
+      service: 'uber', cost: uberCost, time: uberTime, co2: 1.4, reliability: 92, limeUnavailable: false,
+      subOptions: [
+        { icon: '🚗', name: 'Uber',          cost: uberCost,                              time: uberTime,     co2: 1.4, notes: 'Door-to-door, surge pricing applies',    service: 'uber',     available: true },
+        { icon: '🚗', name: 'Bolt',          cost: boltCost,                              time: uberTime,     co2: 1.4, notes: 'Often cheaper than Uber',                service: 'uber',     available: true },
+        { icon: '🚌', name: 'Local minicab', cost: Math.round(uberCost*1.1*100)/100,      time: uberTime + 3, co2: 1.4, notes: 'Fixed price, book ahead via phone',       service: 'taxi',     available: true },
+        ...(distanceKm > 15 ? [{ icon: '🚗', name: 'BlaBlaCar', cost: blaCost, time: blaTime, co2: 0.6, notes: 'Shared long-distance ride', service: 'blablacar', available: true }] : [])
+      ]
+    });
 
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     displayRouteResults(fromLoc, toLoc, routesWithAvailability, time, dayNames[day], availableServices, distanceKm);
@@ -1464,7 +1512,7 @@
     const cardsDiv = document.getElementById('planner-cards');
     if (!cardsDiv) return;
 
-    const SERVICE_DEFAULT_ORDER = ['walk', 'lime', 'lime-scooter', 'bus', 'train', 'indiogo', 'drt', 'blablacar', 'hiyacar', 'taxi', 'uber'];
+    const SERVICE_DEFAULT_ORDER = ['walk', 'cycling', 'lime', 'lime-scooter', 'bus', 'train', 'indiogo', 'drt', 'blablacar', 'hiyacar', 'taxi', 'uber'];
     let routes = [...s.routes];
 
     if (_plannerFilter === 'greenest') {
@@ -1497,17 +1545,56 @@
       return;
     }
 
-    // Out-of-area handling: in demo mode keep natural sort order; otherwise pin to bottom
+    // Out-of-area handling: accordions manage their own sub-option availability
     const fromName = s.fromName || '';
     const toName   = s.toName   || '';
     if (!window.DEMO_MODE) {
-      const inArea    = routes.filter(r =>  isInServiceArea(r.service, fromName, toName));
-      const outOfArea = routes.filter(r => !isInServiceArea(r.service, fromName, toName));
+      const inArea    = routes.filter(r => r.type === 'accordion' ||  isInServiceArea(r.service, fromName, toName));
+      const outOfArea = routes.filter(r => r.type !== 'accordion' && !isInServiceArea(r.service, fromName, toName));
       routes = [...inArea, ...outOfArea];
     }
 
     const [userHour, userMin] = s.time.split(':').map(Number);
     cardsDiv.innerHTML = routes.map((r, idx) => {
+
+      // ── Accordion card renderer ──────────────────────────────────
+      if (r.type === 'accordion') {
+        const subHtml = r.subOptions.map(opt => {
+          const unavail = !opt.available;
+          return `
+            <div class="accordion-sub${unavail ? ' unavailable' : ''}">
+              <div style="flex:1; min-width:0;">
+                <div style="font-weight:600; color:#003366;">${opt.icon} ${opt.name}</div>
+                <div style="color:#999; font-size:11px; margin-top:2px;">${unavail ? '⚠️ Not available on this route' : opt.notes}</div>
+                <div style="font-size:11px; color:#16A34A; margin-top:2px;">🌱 ${opt.co2.toFixed(1)} kg CO₂</div>
+              </div>
+              <div style="text-align:right; flex-shrink:0;">
+                <div style="font-size:13px; font-weight:700; color:#16A34A;">£${opt.cost.toFixed(2)}</div>
+                <div style="font-size:10px; color:#999;">${opt.time} min</div>
+              </div>
+            </div>`;
+        }).join('');
+        return `
+          <div class="option-card">
+            <div class="card-summary" onclick="toggleAccordion('${r.accordionId}')" style="cursor:pointer;">
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:13px; font-weight:600; color:#003366;">${idx+1}. ${r.route}</div>
+                <div style="font-size:11px; color:#999; margin-top:2px;">${r.headlineNote}</div>
+              </div>
+              <div style="flex-shrink:0; margin-left:8px;">
+                <span id="accordion-label-${r.accordionId}" style="font-size:11px; color:#9333EA; font-weight:600; white-space:nowrap;">Show options ▾</span>
+              </div>
+            </div>
+            <div id="accordion-body-${r.accordionId}" class="accordion-body" data-open="false">
+              <div style="padding:4px 16px 12px; display:flex; flex-direction:column; gap:6px;">
+                ${subHtml}
+              </div>
+            </div>
+            <button class="share-btn" onclick="showShareToast(event)">Share route 📲</button>
+          </div>`;
+      }
+
+      // ── Standard card renderer ───────────────────────────────────
       const isUnavailable = r.limeUnavailable;
       const isOutOfArea   = !isInServiceArea(r.service, fromName, toName);
       const departure = getNextDeparture(r.service || 'bus', userHour, userMin);
