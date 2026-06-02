@@ -837,35 +837,91 @@
 
   // ── Route Database (A→B options using Koan data) ──────────
   const ROUTES_DB = {
+    // ── Existing corridors ────────────────────────────────────────
     'coventry-city|uow': [
-      { route: '12X', cost: 2.4, time: 35, reliability: 95, notes: 'Direct, frequent', service: 'bus' },
-      { route: 'Lime Bike', cost: 4.8, time: 22, reliability: 90, notes: 'Fast cycle route', service: 'lime' },
-      { route: 'Uber', cost: 8.5, time: 12, reliability: 92, notes: 'Door-to-door', service: 'uber' }
+      { route: '12X',      cost: 2.40, time: 20, reliability: 95, notes: 'Direct, frequent',     service: 'bus'  },
+      { route: 'Lime Bike',cost: 4.80, time: 20, reliability: 90, notes: 'Fast cycle route',      service: 'lime' },
+      { route: 'Uber',     cost: 8.50, time: 12, reliability: 92, notes: 'Door-to-door',          service: 'uber' }
     ],
     'earlsdon|uow': [
-      { route: '11', cost: 2.4, time: 18, reliability: 92, notes: 'Direct bus to campus', service: 'bus' },
-      { route: '12X', cost: 2.4, time: 22, reliability: 93, notes: 'Via city centre', service: 'bus' },
-      { route: 'Lime Bike', cost: 3.5, time: 12, reliability: 88, notes: 'Quick cycle', service: 'lime' },
-      { route: 'Uber', cost: 6.5, time: 8, reliability: 91, notes: 'Door-to-door', service: 'uber' }
+      { route: 'Bus (11)', cost: 2.40, time: 22, reliability: 92, notes: 'Direct bus to campus',  service: 'bus'  },
+      { route: 'Lime Bike',cost: 2.50, time: 22, reliability: 88, notes: 'Cycle via backstreets', service: 'lime' },
+      { route: 'Uber',     cost: 8.50, time: 13, reliability: 91, notes: 'Door-to-door',          service: 'uber' }
     ],
     'leamington-town|uow': [
-      { route: 'Train + 11', cost: 7.4, time: 35, reliability: 89, notes: 'Train to Coventry, then bus 11', service: 'train' },
-      { route: 'U2 Direct', cost: 2.5, time: 45, reliability: 85, notes: 'Single bus route', service: 'bus' },
-      { route: 'Uber', cost: 12.0, time: 25, reliability: 91, notes: 'Direct', service: 'uber' }
+      { route: 'Train + 11',cost: 7.40, time: 45, reliability: 89, notes: 'Train to Coventry, then bus 11', service: 'train' },
+      { route: 'U2 Direct', cost: 2.50, time: 42, reliability: 85, notes: 'Single bus route',              service: 'bus'   },
+      { route: 'Uber',      cost: 22.00,time: 22, reliability: 91, notes: 'Direct',                        service: 'uber'  }
     ],
     'warwick-town|uow': [
-      { route: 'U2', cost: 2.5, time: 25, reliability: 89, notes: 'Direct route', service: 'bus' },
-      { route: 'Bike', cost: 0, time: 35, reliability: 90, notes: 'Cycle via greenway', service: 'lime' },
-      { route: 'Uber', cost: 10.0, time: 15, reliability: 92, notes: 'Door-to-door', service: 'uber' }
+      { route: 'U2',       cost: 2.50, time: 25, reliability: 89, notes: 'Direct route',          service: 'bus'  },
+      { route: 'Cycle',    cost: 0,    time: 35, reliability: 90, notes: 'Cycle via greenway',     service: 'lime' },
+      { route: 'Uber',     cost: 10.00,time: 15, reliability: 92, notes: 'Door-to-door',          service: 'uber' }
     ],
     'kenilworth|uow': [
-      { route: '11', cost: 2.4, time: 28, reliability: 90, notes: 'Direct to campus via Coventry', service: 'bus' },
-      { route: 'U2', cost: 2.5, time: 30, reliability: 91, notes: 'Via Warwick', service: 'bus' },
-      { route: 'Lime Bike', cost: 0, time: 45, reliability: 85, notes: 'Scenic cycle', service: 'lime' },
-      { route: 'Uber', cost: 9.5, time: 18, reliability: 90, notes: 'Direct', service: 'uber' }
+      { route: 'Bus (11)', cost: 2.40, time: 28, reliability: 90, notes: 'Via Coventry',           service: 'bus'  },
+      { route: 'U2',       cost: 2.50, time: 30, reliability: 91, notes: 'Via Warwick',            service: 'bus'  },
+      { route: 'Lime Bike',cost: 0,    time: 45, reliability: 85, notes: 'Scenic cycle',           service: 'lime' },
+      { route: 'Uber',     cost: 9.50, time: 18, reliability: 90, notes: 'Direct',                 service: 'uber' }
+    ],
+    // ── Demo corridors ────────────────────────────────────────────
+    'uow|coventry-train': [
+      { route: 'Bus (U1/U2)',cost: 2.50, time: 20, reliability: 88, notes: 'U1/U2 to city centre', service: 'bus'  },
+      { route: 'Lime Bike',  cost: 2.30, time: 20, reliability: 85, notes: 'Cycle route',           service: 'lime' },
+      { route: 'Uber',       cost: 9.00, time: 12, reliability: 92, notes: 'Door-to-door',          service: 'uber' }
+    ],
+    'uow|leamington-town': [
+      { route: 'Bus (U2)',        cost: 2.50, time: 42, reliability: 82, notes: 'U2 direct to Leamington',        service: 'bus'   },
+      { route: 'Train (via Cov)', cost: 7.40, time: 45, reliability: 85, notes: 'Bus to Coventry then train',     service: 'train' },
+      { route: 'Lime Bike',       cost: 5.20, time: 42, reliability: 80, notes: 'Long cycle route',               service: 'lime'  },
+      { route: 'Uber',            cost: 23.00,time: 22, reliability: 92, notes: 'Direct',                         service: 'uber'  }
+    ],
+    'uow|warwick-parkway': [
+      { route: 'Bus',      cost: 2.50, time: 32, reliability: 85, notes: 'Bus via Warwick town',   service: 'bus'  },
+      { route: 'Cycle',    cost: 0,    time: 30, reliability: 88, notes: 'Cycle via greenway',     service: 'lime' },
+      { route: 'Uber',     cost: 15.00,time: 15, reliability: 92, notes: 'Direct',                 service: 'uber' }
+    ],
+    'kenilworth|warwick-station': [
+      { route: 'X17 Bus',  cost: 2.50, time: 32, reliability: 80, notes: 'X17 direct',             service: 'bus'  },
+      { route: 'Cycle',    cost: 0,    time: 28, reliability: 85, notes: 'Cycle route',             service: 'lime' },
+      { route: 'Uber',     cost: 13.00,time: 16, reliability: 92, notes: 'Direct',                 service: 'uber' }
     ]
   };
   
+  // ── Service area config — must be defined before runPlannerSearch/initDemoMode ──
+  var SERVICE_AREAS = {
+    'lime-scooter': ['University of Warwick', 'Coventry Train Station', 'Earlsdon, Coventry'],
+    'lime-bike':    ['University of Warwick', 'Coventry Train Station', 'Earlsdon, Coventry'],
+    'indiego':      ['Kenilworth Town Centre', 'University of Warwick'],
+    'coventry-drt': ['Coventry Train Station', 'Earlsdon, Coventry'],
+    'hiyacar':      null,   // available everywhere, never greyed
+    'blablacar':    null    // available everywhere (shown only >15km)
+  };
+
+  function serviceToAreaKey(service) {
+    const map = { 'lime': 'lime-bike', 'lime-scooter': 'lime-scooter', 'indiogo': 'indiego', 'drt': 'coventry-drt', 'hiyacar': 'hiyacar', 'blablacar': 'blablacar' };
+    return map[service] || service;
+  }
+
+  function isInServiceArea(service, fromName, toName) {
+    if (!SERVICE_AREAS) return true;
+    const key = serviceToAreaKey(service);
+    if (!(key in SERVICE_AREAS)) return true;
+    const serviceConfig = SERVICE_AREAS[key];
+    if (!serviceConfig) return true;
+    return serviceConfig.includes(fromName) && serviceConfig.includes(toName);
+  }
+
+  // ── Per-corridor overrides for mock route timings ─────────────
+  var MOCK_TIME_OVERRIDES = {
+    'uow|coventry-train':         { 'lime-scooter': 15, hiyacar: 14 },
+    'uow|coventry-city':          { 'lime-scooter': 17, hiyacar: 15 },
+    'uow|leamington-town':        { hiyacar: 24 },
+    'uow|warwick-parkway':        { hiyacar: 17 },
+    'kenilworth|warwick-station': { indiogo: 25, hiyacar: 18 },
+    'earlsdon|uow':               { 'lime-scooter': 16, drt: 20 }
+  };
+
   async function loadAccommodations() {
     // Dummy load - instant return
     return Promise.resolve();
@@ -1236,7 +1292,8 @@
         { route: 'Uber',      cost: Math.round(8 + distanceKm * 1.5), time: calculateJourneyTime(distanceKm, 'uber'), reliability: 92, notes: 'Door-to-door service',    service: 'uber', co2: 1.4 }
       ];
     } else {
-      allRoutes = allRoutes.map(r => ({ ...r, time: calculateJourneyTime(distanceKm, r.service || 'bus'), co2: co2ForService(r.service) }));
+      // Preserve explicit times from ROUTES_DB; only fall back to calculated if none set
+      allRoutes = allRoutes.map(r => ({ ...r, time: r.time || calculateJourneyTime(distanceKm, r.service || 'bus'), co2: co2ForService(r.service) }));
     }
 
     const availableRoutes = allRoutes.filter(r =>
@@ -1255,14 +1312,14 @@
       notes: `${distanceKm.toFixed(1)} km · no waiting`, service: 'walk', co2: 0.0, limeUnavailable: false
     });
 
-    // Always append mock/new-service routes (hardcoded plausible values, scaled to distance)
-    // Service area config — both from AND to must be in the list; null = always available
+    // Mock/new-service routes — use corridor-specific times where available
     const limeUnavail = !isLimeAvailable(toLoc);
+    const _mt = MOCK_TIME_OVERRIDES[key] || {};
     routesWithAvailability.push(
-      { route: 'Lime Scooter',  cost: 3.20, time: Math.round(distanceKm / 25 * 60) + 2, reliability: 85, notes: 'Requires Lime app and helmet',          service: 'lime-scooter', co2: 0.2, limeUnavailable: limeUnavail },
-      { route: 'HiyaCar',       cost: 6.50, time: Math.round(distanceKm / 35 * 60) + 5, reliability: 82, notes: 'Car club — book via HiyaCar app',        service: 'hiyacar',      co2: 1.2, limeUnavailable: false, sortPenalty: 2 },
-      { route: 'IndieGo',       cost: 2.50, time: Math.round(distanceKm / 24 * 60) + 8, reliability: 80, notes: 'Dial-a-ride — book 30 min ahead',        service: 'indiogo',      co2: 0.3, limeUnavailable: false },
-      { route: 'Coventry DRT',  cost: 2.00, time: Math.round(distanceKm / 22 * 60) + 8, reliability: 78, notes: 'On-demand bus — Coventry zones only',    service: 'drt',          co2: 0.3, limeUnavailable: false }
+      { route: 'Lime Scooter', cost: 3.20, time: _mt['lime-scooter'] || Math.round(distanceKm / 25 * 60) + 2, reliability: 85, notes: 'Requires Lime app and helmet',       service: 'lime-scooter', co2: 0.2, limeUnavailable: limeUnavail },
+      { route: 'HiyaCar',      cost: 6.50, time: _mt.hiyacar         || Math.round(distanceKm / 35 * 60) + 5, reliability: 82, notes: 'Car club — book via HiyaCar app',    service: 'hiyacar',      co2: 1.2, limeUnavailable: false, sortPenalty: 2 },
+      { route: 'IndieGo',      cost: 2.50, time: _mt.indiogo         || Math.round(distanceKm / 24 * 60) + 8, reliability: 80, notes: 'Dial-a-ride — book 30 min ahead',    service: 'indiogo',      co2: 0.3, limeUnavailable: false },
+      { route: 'Coventry DRT', cost: 2.00, time: _mt.drt             || Math.round(distanceKm / 22 * 60) + 8, reliability: 78, notes: 'On-demand bus — Coventry zones only',service: 'drt',          co2: 0.3, limeUnavailable: false }
     );
     // BlaBlaCar only makes sense for longer journeys (>15 km)
     if (distanceKm > 15) {
@@ -1371,37 +1428,6 @@
     initDemoMode();
   }
   
-  // ── Service area config ─────────────────────────────────────────
-  var SERVICE_AREAS = {
-    'lime-scooter': ['University of Warwick', 'Coventry Train Station', 'Earlsdon, Coventry'],
-    'lime-bike':    ['University of Warwick', 'Coventry Train Station', 'Earlsdon, Coventry'],
-    'indiego':      ['Kenilworth Town Centre', 'University of Warwick'],
-    'coventry-drt': ['Coventry Train Station', 'Earlsdon, Coventry'],
-    'hiyacar':      null,  // available everywhere, never greyed
-    'blablacar':    null   // available everywhere (but only shown >15km)
-  };
-
-  // Map route service keys → SERVICE_AREAS keys (they differ for legacy reasons)
-  // Note: route data uses 'indiogo' (typo), SERVICE_AREAS key is 'indiego'
-  function serviceToAreaKey(service) {
-    const map = {
-      'lime':         'lime-bike',
-      'lime-scooter': 'lime-scooter',
-      'indiogo':      'indiego',
-      'drt':          'coventry-drt',
-      'hiyacar':      'hiyacar'
-    };
-    return map[service] || service;
-  }
-
-  function isInServiceArea(service, fromName, toName) {
-    const key = serviceToAreaKey(service);
-    if (!(key in SERVICE_AREAS)) return true; // unknown service = no restriction
-    const areas = SERVICE_AREAS[key];
-    if (areas === null) return true;          // null = available everywhere
-    return areas.includes(fromName) && areas.includes(toName);
-  }
-
   // ── Service emoji helper ────────────────────────────────────────
   function serviceEmoji(service) {
     const map = { bus: '🚌', train: '🚆', lime: '🚲', 'lime-scooter': '🛴', walk: '🚶', cycling: '🚲', uber: '🚖', taxi: '🚖', hiyacar: '🚗', blablacar: '🚗', indiogo: '🚐', drt: '🚌' };
