@@ -1548,19 +1548,19 @@
       ${warningHtml}
 
       ${routes.length > 0 ? `
-        <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
           <button class="filter-pill" data-filter="greenest" onclick="setPlannerFilter('greenest')">🌱 Greenest</button>
           <button class="filter-pill" data-filter="fastest"  onclick="setPlannerFilter('fastest')">⚡ Fastest</button>
           <button class="filter-pill" data-filter="cheapest" onclick="setPlannerFilter('cheapest')">💸 Cheapest</button>
         </div>
       ` : ''}
 
-      <div id="planner-cards" style="display: flex; flex-direction: column; gap: 10px;"></div>
-
-      <div style="margin-top: 12px; padding: 12px; background: #F0F9FF; border-radius: 8px; border-left: 3px solid #0284C7; font-size: 11px; color: #0C4A6E;">
+      <div style="margin-bottom: 10px; padding: 10px 12px; background: #F0F9FF; border-radius: 8px; border-left: 3px solid #0284C7; font-size: 11px; color: #0C4A6E;">
         <strong>💡 Available services:</strong> ${availableServices.join(' · ')}
         ${routes.some(r => r.limeUnavailable) ? '<br><strong>ℹ️ Lime</strong> only operates in Coventry (CV1-6) & University of Warwick campus' : ''}
       </div>
+
+      <div id="planner-cards" style="display: flex; flex-direction: column; gap: 10px;"></div>
 
       <button class="report-btn" onclick="openGapModal('${from.name.replace(/'/g,"\\'")}','${to.name.replace(/'/g,"\\'")}')">🚨 Report a Gap in the Network</button>
     `;
