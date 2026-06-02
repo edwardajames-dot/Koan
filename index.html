@@ -1513,6 +1513,40 @@
     return map[service] !== undefined ? map[service] : 0.5;
   }
 
+  // ── Smart scoring for default sort ─────────────────────────────
+  function calculateSmartScore(route, allRoutes) {
+    // For accordion cards use representative sub-option values for normalisation
+    function routeValues(r) {
+      if (r.type === 'accordion') {
+        if (r.accordionId === 'bikes-scooters') return { time: r.time, cost: 0,      co2: 0.0, reliability: 100 };
+        if (r.accordionId === 'taxi-rideshare') return { time: r.time, cost: r.cost, co2: 1.4, reliability: 92  };
+      }
+      return { time: r.time, cost: r.cost || 0, co2: r.co2 || 0, reliability: r.reliability || 80 };
+    }
+
+    const vals = allRoutes.map(routeValues);
+    const maxTime = Math.max(...vals.map(v => v.time), 1);
+    const maxCost = Math.max(...vals.map(v => v.cost), 1);
+    const maxCo2  = Math.max(...vals.map(v => v.co2),  1);
+
+    const rv = routeValues(route);
+    const timeNorm        = rv.time / maxTime;
+    const costNorm        = rv.cost / maxCost;
+    const co2Norm         = rv.co2  / maxCo2;
+    const reliabilityNorm = 1 - (rv.reliability / 100);
+
+    let score = (timeNorm * 0.35) + (costNorm * 0.30) + (co2Norm * 0.20) + (reliabilityNorm * 0.15);
+
+    // Walk penalty: long walks shouldn't top results
+    if (route.service === 'walk' && route.time > 20) score += 0.3;
+
+    // Plan-ahead penalty: keeps these below instant options in default view
+    const PLAN_AHEAD_SET = new Set(['indiogo', 'drt', 'hiyacar', 'brompton']);
+    if (PLAN_AHEAD_SET.has(route.service)) score += 0.15;
+
+    return score;
+  }
+
   // ── Planner filter state ────────────────────────────────────────
   var _plannerFilter = null; // null | 'free' | 'cheapest' | 'fastest'
   var _lastPlannerSearch = null; // stores last search context for re-renders
@@ -1545,18 +1579,10 @@
         return a.cost - b.cost;
       });
     } else {
-      // Default: low-carbon-first, walk first if ≤ 15 min; sortPenalty shifts rank down
-      routes = routes.slice().sort((a, b) => {
-        const aWalk = a.service === 'walk' && a.time <= 15;
-        const bWalk = b.service === 'walk' && b.time <= 15;
-        if (aWalk && !bWalk) return -1;
-        if (bWalk && !aWalk) return 1;
-        const aIdx = SERVICE_DEFAULT_ORDER.indexOf(a.service);
-        const bIdx = SERVICE_DEFAULT_ORDER.indexOf(b.service);
-        const aRank = (aIdx === -1 ? 99 : aIdx) + (a.sortPenalty || 0);
-        const bRank = (bIdx === -1 ? 99 : bIdx) + (b.sortPenalty || 0);
-        return aRank - bRank;
-      });
+      // Default: smart multi-dimension score (lower = better)
+      routes = routes.slice().sort((a, b) =>
+        calculateSmartScore(a, routes) - calculateSmartScore(b, routes)
+      );
     }
 
     if (routes.length === 0) {
