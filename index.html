@@ -73,6 +73,10 @@
   .accordion-body { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
   .accordion-sub { margin-left: 8px; border-left: 2px solid #E8EBF0; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; font-size: 0.9em; }
   .accordion-sub.unavailable { opacity: 0.45; }
+  .results-divider { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+  .results-divider hr { flex: 1; border: none; border-top: 1px solid #E8EBF0; }
+  .results-divider span { font-size: 0.8em; color: #999999; white-space: nowrap; }
+  .book-ahead-badge { display: inline-block; font-size: 10px; font-weight: 600; color: #666666; background: #F0F4F8; border-radius: 4px; padding: 1px 6px; margin-left: 6px; vertical-align: middle; }
   .report-btn { display: block; width: 100%; margin-top: 14px; padding: 11px; background: #FFFFFF; border: 1.5px solid #9333EA; border-radius: 10px; color: #9333EA; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; }
   .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; display: flex; align-items: flex-end; justify-content: center; }
   .modal-sheet { background: #FFFFFF; border-radius: 20px 20px 0 0; padding: 24px 20px 36px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
@@ -1554,8 +1558,18 @@
       routes = [...inArea, ...outOfArea];
     }
 
+    // ── Plan-ahead split ─────────────────────────────────────────
+    const PLAN_AHEAD_SERVICES = new Set(['indiogo', 'drt', 'hiyacar', 'brompton']);
+    const PLAN_AHEAD_BADGE = { indiogo: 'Book 30 min ahead', drt: 'Book 30 min ahead', hiyacar: 'Book 1–2 hrs ahead', brompton: 'Reserve in advance' };
+
+    const instantRoutes   = routes.filter(r => !PLAN_AHEAD_SERVICES.has(r.service));
+    const planAheadRoutes = routes.filter(r =>  PLAN_AHEAD_SERVICES.has(r.service));
+    // Rebuild in display order: instant first, plan-ahead after
+    const orderedRoutes = [...instantRoutes, ...planAheadRoutes];
+
     const [userHour, userMin] = s.time.split(':').map(Number);
-    cardsDiv.innerHTML = routes.map((r, idx) => {
+
+    function renderCard(r, idx) {
 
       // ── Accordion card renderer ──────────────────────────────────
       if (r.type === 'accordion') {
@@ -1600,6 +1614,7 @@
       const departure = getNextDeparture(r.service || 'bus', userHour, userMin);
       const arrival = departure ? getArrivalTime(departure.hour, departure.min, r.time, departure.variance) : null;
       const estimate = getCostEstimate(r.service || 'bus');
+      const badge = PLAN_AHEAD_BADGE[r.service];
       return `
         <div class="option-card${isOutOfArea ? ' card-unavailable' : ''}" style="${isUnavailable ? 'opacity: 0.5; background: #F3F4F6;' : ''}">
           ${getReliabilityWarningHTML(r.route, r.service || 'bus')}
@@ -1607,6 +1622,7 @@
             <div style="flex: 1; min-width: 0;">
               <div style="font-size: 13px; font-weight: 600; color: #003366;">
                 ${idx + 1}. ${r.route}
+                ${badge ? `<span class="book-ahead-badge">${badge}</span>` : ''}
                 ${isUnavailable ? '<span style="font-size: 10px; color: #999999; margin-left: 8px;"> (not available in this area)</span>' : ''}
               </div>
               <div style="font-size: 11px; color: #999999; margin-top: 2px;">${isOutOfArea ? '⚠️ Not available on this route' : r.notes}</div>
@@ -1632,7 +1648,18 @@
           <button class="share-btn" onclick="showShareToast(event)">Share route 📲</button>
         </div>
       `;
-    }).join('');
+    }
+
+    // Render instant cards, then divider (if plan-ahead services exist), then plan-ahead cards
+    const dividerHtml = planAheadRoutes.length > 0 ? `
+      <div class="results-divider">
+        <hr><span>⏱ Plan ahead for more options</span><hr>
+      </div>` : '';
+
+    cardsDiv.innerHTML =
+      instantRoutes.map((r, idx) => renderCard(r, idx)).join('') +
+      dividerHtml +
+      planAheadRoutes.map((r, idx) => renderCard(r, instantRoutes.length + idx)).join('');
   }
 
   function displayRouteResults(from, to, routes, time, dayName, availableServices, distanceKm) {
