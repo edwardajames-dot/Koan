@@ -303,6 +303,39 @@ app.get('/api/student-accommodation', async (req, res) => {
   }
 });
 
+// ── Demand logging ───────────────────────────────────────────
+const fs = require('fs');
+const path = require('path');
+const DEMAND_LOG = path.join(__dirname, 'demand-log.json');
+
+app.post('/api/log-demand', express.json(), (req, res) => {
+  try {
+    const entry = JSON.stringify(req.body) + '\n';
+    fs.appendFileSync(DEMAND_LOG, entry, 'utf8');
+  } catch (_) { /* swallow all errors — never fail the client */ }
+  res.status(200).json({ ok: true });
+});
+
+// ── Gap logging ──────────────────────────────────────────────
+const GAP_LOG = path.join(__dirname, 'gap-log.json');
+
+app.post('/api/log-gap', express.json(), (req, res) => {
+  try {
+    fs.appendFileSync(GAP_LOG, JSON.stringify(req.body) + '\n', 'utf8');
+  } catch (_) {}
+  res.status(200).json({ ok: true });
+});
+
+// ── Travel logging ───────────────────────────────────────────
+const TRAVEL_LOG = path.join(__dirname, 'travel-log.json');
+
+app.post('/api/log-travel', express.json(), (req, res) => {
+  try {
+    fs.appendFileSync(TRAVEL_LOG, JSON.stringify(req.body) + '\n', 'utf8');
+  } catch (_) {}
+  res.status(200).json({ ok: true });
+});
+
 // ── Health check ─────────────────────────────────────────────
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
