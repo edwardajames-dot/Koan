@@ -872,37 +872,47 @@
       { route: 'Uber',     cost: 9.50, time: 18, reliability: 90, notes: 'Direct',                 service: 'uber' }
     ],
     // ── Demo corridors ────────────────────────────────────────────
-    // UoW → Coventry City Centre (first demo pill — ~4.6km)
+    // UoW → Coventry City Centre (~4.6km)
     'uow|coventry-city': [
-      { route: 'Bus (U1/U2)', cost: 2.50, time: 20, reliability: 88, notes: 'U1/U2 to city centre',         service: 'bus',   co2: 0.7 },
-      { route: 'Train',        cost: 3.50, time: 15, reliability: 90, notes: 'Via Canley station',            service: 'train', co2: 0.4 },
-      { route: 'Lime Bike',    cost: 2.00, time: 20, reliability: 85, notes: 'Cycle route',                  service: 'lime',  co2: 0.0 },
-      { route: 'Uber',         cost: 9.00, time: 12, reliability: 92, notes: 'Door-to-door',                 service: 'uber',  co2: 1.4 }
+      { route: 'Bus (U1/U2)', cost: 2.50, time: 20, reliability: 88, notes: 'U1/U2 to city centre',                  service: 'bus',   co2: 0.7 },
+      { route: 'Train',        cost: 3.50, time: 25, reliability: 82, notes: 'Walk to Canley (~15 min) + 8 min train',service: 'train', co2: 0.4 },
+      { route: 'Lime Bike',    cost: 2.00, time: 20, reliability: 85, notes: 'Cycle route',                           service: 'lime',  co2: 0.0 },
+      { route: 'Uber',         cost: 9.00, time: 12, reliability: 92, notes: 'Door-to-door',                          service: 'uber',  co2: 1.4 }
     ],
-    // UoW → Coventry Train Station (~4.6km, similar corridor)
+    // UoW → Coventry Train Station (~4.6km)
     'uow|coventry-train': [
-      { route: 'Bus (U1/U2)', cost: 2.50, time: 20, reliability: 88, notes: 'U1/U2 to city centre',         service: 'bus',   co2: 0.7 },
-      { route: 'Train',        cost: 3.50, time: 15, reliability: 90, notes: 'Via Canley station',            service: 'train', co2: 0.4 },
-      { route: 'Lime Bike',    cost: 2.00, time: 20, reliability: 85, notes: 'Cycle route',                  service: 'lime',  co2: 0.0 },
-      { route: 'Uber',         cost: 9.00, time: 12, reliability: 92, notes: 'Door-to-door',                 service: 'uber',  co2: 1.4 }
+      { route: 'Bus (U1/U2)', cost: 2.50, time: 20, reliability: 88, notes: 'U1/U2 to city centre',                  service: 'bus',   co2: 0.7 },
+      { route: 'Train',        cost: 3.50, time: 25, reliability: 82, notes: 'Walk to Canley (~15 min) + 8 min train',service: 'train', co2: 0.4 },
+      { route: 'Lime Bike',    cost: 2.00, time: 20, reliability: 85, notes: 'Cycle route',                           service: 'lime',  co2: 0.0 },
+      { route: 'Uber',         cost: 9.00, time: 12, reliability: 92, notes: 'Door-to-door',                          service: 'uber',  co2: 1.4 }
     ],
+    // UoW → Leamington Spa Town Centre (~10.4km)
     'uow|leamington-town': [
-      { route: 'Bus (U2)',        cost: 2.50, time: 42, reliability: 82, notes: 'U2 direct to Leamington',   service: 'bus',   co2: 0.7 },
-      { route: 'Train (via Cov)', cost: 5.20, time: 35, reliability: 85, notes: 'Bus to Coventry then train',service: 'train', co2: 0.6 },
-      { route: 'Lime Bike',       cost: 2.00, time: 42, reliability: 80, notes: 'Long cycle route',          service: 'lime',  co2: 0.0 },
-      { route: 'Uber',            cost: 23.00,time: 22, reliability: 92, notes: 'Direct',                    service: 'uber',  co2: 1.4 }
+      { route: 'Bus (U2)',        cost: 2.50, time: 42, reliability: 82, notes: 'U2 direct to Leamington',            service: 'bus',   co2: 0.7 },
+      { route: 'Train',           cost: 5.20, time: 52, reliability: 75, notes: 'Walk to Canley + change at Coventry',service: 'train', co2: 0.6 },
+      { route: 'Lime Bike',       cost: 2.00, time: 42, reliability: 80, notes: 'Long cycle route',                   service: 'lime',  co2: 0.0 },
+      { route: 'Uber',            cost: 23.00,time: 22, reliability: 92, notes: 'Direct',                             service: 'uber',  co2: 1.4 }
     ],
+    // UoW → Leamington Spa Train Station (~10.4km — station is destination, no extra walk)
+    'uow|leamington-train': [
+      { route: 'Bus (U2)', cost: 2.40, time: 45, reliability: 82, notes: 'U2 to Leamington',                          service: 'bus',   co2: 0.7 },
+      { route: 'Train',    cost: 5.20, time: 52, reliability: 75, notes: 'Walk to Canley + change at Coventry',        service: 'train', co2: 0.6 },
+      { route: 'Cycle',    cost: 0,    time: 42, reliability: 85, notes: 'Cycle route',                                service: 'lime',  co2: 0.0 },
+      { route: 'Uber',     cost: 18.00,time: 20, reliability: 92, notes: 'Direct',                                     service: 'uber',  co2: 1.4 }
+    ],
+    // UoW → Warwick Parkway Station (~8km — no direct train from Canley)
     'uow|warwick-parkway': [
-      { route: 'Bus',   cost: 2.50, time: 32, reliability: 85, notes: 'Bus via Warwick town',               service: 'bus',   co2: 0.7 },
-      { route: 'Train', cost: 3.20, time: 12, reliability: 92, notes: 'Direct Chiltern Railways service',    service: 'train', co2: 0.3 },
-      { route: 'Cycle', cost: 0,    time: 30, reliability: 88, notes: 'Cycle via greenway',                 service: 'lime',  co2: 0.0 },
-      { route: 'Uber',  cost: 15.00,time: 15, reliability: 92, notes: 'Direct',                             service: 'uber',  co2: 1.4 }
+      { route: 'Bus',   cost: 2.50, time: 32, reliability: 85, notes: 'Bus via Warwick town',                         service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 3.20, time: 48, reliability: 75, notes: 'Walk to Canley + change at Coventry',          service: 'train', co2: 0.3 },
+      { route: 'Cycle', cost: 0,    time: 30, reliability: 88, notes: 'Cycle via greenway',                           service: 'lime',  co2: 0.0 },
+      { route: 'Uber',  cost: 15.00,time: 15, reliability: 92, notes: 'Direct',                                       service: 'uber',  co2: 1.4 }
     ],
+    // Kenilworth → Warwick Station (~7km)
     'kenilworth|warwick-station': [
-      { route: 'X17 Bus', cost: 2.50, time: 32, reliability: 80, notes: 'X17 direct',                       service: 'bus',   co2: 0.7 },
-      { route: 'Train',   cost: 4.50, time: 28, reliability: 72, notes: 'Limited service — check timetable',service: 'train', co2: 0.4 },
-      { route: 'Cycle',   cost: 0,    time: 28, reliability: 85, notes: 'Cycle route',                      service: 'lime',  co2: 0.0 },
-      { route: 'Uber',    cost: 13.00,time: 16, reliability: 92, notes: 'Direct',                           service: 'uber',  co2: 1.4 }
+      { route: 'X17 Bus', cost: 2.50, time: 32, reliability: 80, notes: 'X17 direct',                                 service: 'bus',   co2: 0.7 },
+      { route: 'Train',   cost: 4.50, time: 35, reliability: 70, notes: 'Limited service — check timetable',          service: 'train', co2: 0.4 },
+      { route: 'Cycle',   cost: 0,    time: 28, reliability: 85, notes: 'Cycle route',                                service: 'lime',  co2: 0.0 },
+      { route: 'Uber',    cost: 13.00,time: 16, reliability: 92, notes: 'Direct',                                     service: 'uber',  co2: 1.4 }
     ]
   };
   
@@ -1441,8 +1451,9 @@
     { label: 'UoW → Coventry',         from: 'University of Warwick',   to: 'Coventry City Centre'       },
     { label: 'UoW → Leamington',       from: 'University of Warwick',   to: 'Leamington Spa Town Centre' },
     { label: 'Earlsdon → UoW',         from: 'Earlsdon, Coventry',      to: 'University of Warwick'      },
-    { label: 'UoW → Parkway',          from: 'University of Warwick',   to: 'Warwick Parkway Station'    },
-    { label: 'Kenilworth → Warwick',   from: 'Kenilworth Town Centre',  to: 'Warwick Station'            }
+    { label: 'UoW → Parkway',          from: 'University of Warwick',   to: 'Warwick Parkway Station'       },
+    { label: 'Kenilworth → Warwick',   from: 'Kenilworth Town Centre',  to: 'Warwick Station'               },
+    { label: 'UoW → Leamington Stn',  from: 'University of Warwick',   to: 'Leamington Spa Train Station'  }
   ];
 
   function applyDemoRoute(from, to) {
