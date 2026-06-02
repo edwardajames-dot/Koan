@@ -865,6 +865,13 @@
       { route: 'Uber',     cost: 9.50, time: 18, reliability: 90, notes: 'Direct',                 service: 'uber' }
     ],
     // ── Demo corridors ────────────────────────────────────────────
+    // UoW → Coventry City Centre (first demo pill — ~4.6km)
+    'uow|coventry-city': [
+      { route: 'Bus (U1/U2)',cost: 2.50, time: 20, reliability: 88, notes: 'U1/U2 to city centre', service: 'bus'  },
+      { route: 'Lime Bike',  cost: 2.30, time: 20, reliability: 85, notes: 'Cycle route',           service: 'lime' },
+      { route: 'Uber',       cost: 9.00, time: 12, reliability: 92, notes: 'Door-to-door',          service: 'uber' }
+    ],
+    // UoW → Coventry Train Station (~4.6km, similar corridor)
     'uow|coventry-train': [
       { route: 'Bus (U1/U2)',cost: 2.50, time: 20, reliability: 88, notes: 'U1/U2 to city centre', service: 'bus'  },
       { route: 'Lime Bike',  cost: 2.30, time: 20, reliability: 85, notes: 'Cycle route',           service: 'lime' },
@@ -1595,8 +1602,8 @@
   }
 
   // ── Follow-up prompt ("How did you travel?") ───────────────────
-  let _followupTimer   = null;
-  let _followupContext = null; // { fromName, toName, day, time, searchTime, modes[] }
+  var _followupTimer   = null;
+  var _followupContext = null; // { fromName, toName, day, time, searchTime, modes[] }
 
   function scheduleFollowup(fromName, toName, day, time, topModes) {
     // Cancel any previous pending prompt
@@ -1651,7 +1658,7 @@
   }
 
   // ── Gap reporting ───────────────────────────────────────────────
-  let _gapFrom = '', _gapTo = '';
+  var _gapFrom = '', _gapTo = '';
 
   function openGapModal(from, to) {
     _gapFrom = from;
@@ -1668,7 +1675,7 @@
     document.body.style.overflow = '';
   }
 
-  let _gapToastTimer = null;
+  var _gapToastTimer = null;
   function showGapToast(msg) {
     const el = document.getElementById('gap-toast');
     el.textContent = msg;
