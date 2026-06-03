@@ -638,7 +638,8 @@
     { id: 'warwick-town',    name: 'Warwick Town Centre',      lat: 52.2811, lng: -1.5860, area: 'Warwick',    postcodes: ['CV34'] },
     { id: 'warwick-station', name: 'Warwick Station',           lat: 52.2808, lng: -1.5844, area: 'Warwick',    postcodes: ['CV34'] },
     { id: 'warwick-parkway', name: 'Warwick Parkway Station',   lat: 52.2951, lng: -1.6023, area: 'Warwick',    postcodes: ['CV34', 'CV35'] },
-    { id: 'kenilworth',      name: 'Kenilworth Town Centre',    lat: 52.3416, lng: -1.5755, area: 'Kenilworth', postcodes: ['CV8'] },
+    { id: 'kenilworth',         name: 'Kenilworth Town Centre', lat: 52.3416, lng: -1.5755, area: 'Kenilworth', postcodes: ['CV8'] },
+    { id: 'kenilworth-station', name: 'Kenilworth Station',    lat: 52.3429, lng: -1.5726, area: 'Kenilworth', postcodes: ['CV8'] },
     { id: 'earlsdon', name: 'Earlsdon, Coventry', lat: 52.3888, lng: -1.5067, area: 'Coventry', postcodes: ['CV5'] },
     { id: 'tile-hill', name: 'Tile Hill, Coventry', lat: 52.3950, lng: -1.4850, area: 'Coventry', postcodes: ['CV4'] },
     { id: 'canley', name: 'Canley, Coventry', lat: 52.3705, lng: -1.5234, area: 'Coventry', postcodes: ['CV4'] },
@@ -866,10 +867,65 @@
       { route: 'Uber',     cost: 10.00,time: 15, reliability: 92, notes: 'Door-to-door',          service: 'uber' }
     ],
     'kenilworth|uow': [
-      { route: 'Bus (11)', cost: 2.40, time: 28, reliability: 90, notes: 'Via Coventry',           service: 'bus'  },
-      { route: 'U2',       cost: 2.50, time: 30, reliability: 91, notes: 'Via Warwick',            service: 'bus'  },
-      { route: 'Lime Bike',cost: 0,    time: 45, reliability: 85, notes: 'Scenic cycle',           service: 'lime' },
-      { route: 'Uber',     cost: 9.50, time: 18, reliability: 90, notes: 'Direct',                 service: 'uber' }
+      { route: 'Bus (11)', cost: 2.40, time: 28, reliability: 90, notes: 'Via Coventry',                                             service: 'bus',   co2: 0.7 },
+      { route: 'U2',       cost: 2.50, time: 30, reliability: 91, notes: 'Via Warwick',                                              service: 'bus',   co2: 0.7 },
+      { route: 'Train',    cost: 4.50, time: 35, reliability: 75, notes: 'Change at Leamington + Coventry · not recommended — bus faster', service: 'train', co2: 0.5 },
+      { route: 'Lime Bike',cost: 0,    time: 45, reliability: 85, notes: 'Scenic cycle',                                             service: 'lime',  co2: 0.0 },
+      { route: 'Uber',     cost: 9.50, time: 18, reliability: 90, notes: 'Direct',                                                   service: 'uber',  co2: 1.4 }
+    ],
+    // ── Kenilworth Station corridors ──────────────────────────────
+    'kenilworth-station|uow': [
+      { route: 'Bus (11)', cost: 2.40, time: 28, reliability: 90, notes: 'Via Coventry',                                             service: 'bus',   co2: 0.7 },
+      { route: 'Train',    cost: 4.50, time: 35, reliability: 75, notes: 'Change at Leamington + Coventry · not recommended — bus faster', service: 'train', co2: 0.5 },
+      { route: 'Uber',     cost: 9.50, time: 18, reliability: 90, notes: 'Direct',                                                   service: 'uber',  co2: 1.4 }
+    ],
+    'kenilworth|coventry-city': [
+      { route: 'Bus',   cost: 2.40, time: 32, reliability: 85, notes: 'Via Coventry city centre',                                    service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 2.60, time: 10, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services', service: 'train', co2: 0.3 },
+      { route: 'Uber',  cost: 12.00,time: 18, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+    ],
+    'kenilworth-station|coventry-city': [
+      { route: 'Bus',   cost: 2.40, time: 32, reliability: 85, notes: 'Via Coventry city centre',                                    service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 2.60, time: 10, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services', service: 'train', co2: 0.3 },
+      { route: 'Uber',  cost: 12.00,time: 18, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+    ],
+    'kenilworth|coventry-train': [
+      { route: 'Train', cost: 2.60, time: 10, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services', service: 'train', co2: 0.3 },
+      { route: 'Uber',  cost: 12.00,time: 18, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+    ],
+    'kenilworth-station|coventry-train': [
+      { route: 'Train', cost: 2.60, time: 10, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services', service: 'train', co2: 0.3 },
+      { route: 'Uber',  cost: 12.00,time: 18, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+    ],
+    'kenilworth|leamington-town': [
+      { route: 'Bus',   cost: 2.40, time: 25, reliability: 80, notes: 'Via Leamington',                                             service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 2.60, time:  8, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services', service: 'train', co2: 0.2 },
+      { route: 'Uber',  cost: 11.00,time: 15, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+    ],
+    'kenilworth-station|leamington-town': [
+      { route: 'Train', cost: 2.60, time:  8, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services', service: 'train', co2: 0.2 },
+      { route: 'Uber',  cost: 11.00,time: 15, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+    ],
+    'kenilworth|leamington-train': [
+      { route: 'Train', cost: 2.60, time:  8, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services', service: 'train', co2: 0.2 },
+      { route: 'Uber',  cost: 11.00,time: 15, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+    ],
+    'kenilworth-station|leamington-train': [
+      { route: 'Train', cost: 2.60, time:  8, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services', service: 'train', co2: 0.2 },
+      { route: 'Uber',  cost: 11.00,time: 15, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+    ],
+    'kenilworth|warwick-town': [
+      { route: 'Bus',   cost: 2.50, time: 28, reliability: 80, notes: 'Via town centre',                                            service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 3.20, time: 22, reliability: 78, notes: 'Change at Leamington Spa · check timetable for Sunday services', service: 'train', co2: 0.4 },
+      { route: 'Uber',  cost: 10.00,time: 14, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+    ],
+    'kenilworth-station|warwick-town': [
+      { route: 'Train', cost: 3.20, time: 22, reliability: 78, notes: 'Change at Leamington Spa · check timetable for Sunday services', service: 'train', co2: 0.4 },
+      { route: 'Uber',  cost: 10.00,time: 14, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+    ],
+    'kenilworth-station|warwick-station': [
+      { route: 'Train', cost: 3.20, time: 22, reliability: 78, notes: 'Change at Leamington Spa · check timetable for Sunday services', service: 'train', co2: 0.4 },
+      { route: 'Uber',  cost: 10.00,time: 14, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
     ],
     // ── Demo corridors ────────────────────────────────────────────
     // UoW → Coventry City Centre (~4.6km)
@@ -909,10 +965,10 @@
     ],
     // Kenilworth → Warwick Station (~7km)
     'kenilworth|warwick-station': [
-      { route: 'X17 Bus', cost: 2.50, time: 32, reliability: 80, notes: 'X17 direct',                                 service: 'bus',   co2: 0.7 },
-      { route: 'Train',   cost: 4.50, time: 35, reliability: 70, notes: 'Limited service — check timetable',          service: 'train', co2: 0.4 },
-      { route: 'Cycle',   cost: 0,    time: 28, reliability: 85, notes: 'Cycle route',                                service: 'lime',  co2: 0.0 },
-      { route: 'Uber',    cost: 13.00,time: 16, reliability: 92, notes: 'Direct',                                     service: 'uber',  co2: 1.4 }
+      { route: 'X17 Bus', cost: 2.50, time: 32, reliability: 80, notes: 'X17 direct',                                               service: 'bus',   co2: 0.7 },
+      { route: 'Train',   cost: 3.20, time: 22, reliability: 78, notes: 'Change at Leamington Spa · check timetable for Sunday services', service: 'train', co2: 0.4 },
+      { route: 'Cycle',   cost: 0,    time: 28, reliability: 85, notes: 'Cycle route',                                               service: 'lime',  co2: 0.0 },
+      { route: 'Uber',    cost: 13.00,time: 16, reliability: 92, notes: 'Direct',                                                    service: 'uber',  co2: 1.4 }
     ]
   };
   
@@ -1375,17 +1431,20 @@
     // ── Accordion: Bikes & Scooters ───────────────────────────────
     const limeAvailHere = isLimeAvailable(toLoc);
     const scooterTime   = _mt['lime-scooter'] || Math.round(distanceKm / 25 * 60) + 2;
-    const isKenilworthRoute = ['kenilworth'].includes(fromLoc.id) || ['kenilworth'].includes(toLoc.id);
+    const personalBikeTime = limeTime;                            // cycling speed baseline
+    const limeBikeTime     = Math.round(personalBikeTime * 0.80); // e-assist is ~20% faster
+    const isKenilworthRoute = ['kenilworth', 'kenilworth-station'].includes(fromLoc.id) ||
+                              ['kenilworth', 'kenilworth-station'].includes(toLoc.id);
     routesWithAvailability.push({
       type: 'accordion', accordionId: 'bikes-scooters',
       route: 'Bikes & Scooters',
-      headlineNote: `Free · ~${limeTime} min`,
-      service: 'cycling', cost: 0, time: limeTime, co2: 0.0, reliability: 95, limeUnavailable: false,
+      headlineNote: `Free · ~${personalBikeTime} min`,
+      service: 'cycling', cost: 0, time: personalBikeTime, co2: 0.0, reliability: 95, limeUnavailable: false,
       subOptions: [
-        { icon: '🚴', name: 'Personal bike',  cost: 0,     time: limeTime,    co2: 0.0, notes: 'Your own bike — no cost, no app needed',        service: 'cycling',      available: true },
-        { icon: '🚲', name: 'Lime Bike',    cost: 2.00, time: limeTime,    co2: 0.0, notes: 'Free first 30 min with UniRider · Lime app', service: 'lime',         available: limeAvailHere },
-        { icon: '🛴', name: 'Lime Scooter', cost: 4.75, time: scooterTime, co2: 0.2, notes: '£1 unlock + £0.25/min · Lime app required',    service: 'lime-scooter', available: limeAvailHere },
-        ...(isKenilworthRoute ? [{ icon: '🚲', name: 'Brompton hire', cost: 5.00, time: limeTime, co2: 0.0, notes: 'Hire from Kenilworth Station · £5/day', service: 'cycling', available: true }] : [])
+        { icon: '🚴', name: 'Personal bike', cost: 0,    time: personalBikeTime, co2: 0.0, notes: 'Your own bike — no cost, no app needed',         service: 'cycling',      available: true },
+        { icon: '🚲', name: 'Lime Bike',      cost: 2.00, time: limeBikeTime,     co2: 0.0, notes: 'Electric-assisted · Free first 30 min with UniRider', service: 'lime',     available: limeAvailHere },
+        { icon: '🛴', name: 'Lime Scooter',   cost: 4.75, time: scooterTime,      co2: 0.2, notes: '£1 unlock + £0.25/min · Lime app required',         service: 'lime-scooter', available: limeAvailHere },
+        ...(isKenilworthRoute ? [{ icon: '🚲', name: 'Brompton hire', cost: 5.00, time: personalBikeTime, co2: 0.0, notes: 'Hire from Kenilworth Station · £5/day', service: 'cycling', available: true }] : [])
       ]
     });
 
@@ -1614,14 +1673,21 @@
 
       // ── Accordion card renderer ──────────────────────────────────
       if (r.type === 'accordion') {
+        const isK2LRoute = fromName.toLowerCase().includes('kenilworth') &&
+                           toName.toLowerCase().includes('leamington');
+        const CYCLING_SERVICES = new Set(['cycling', 'lime', 'lime-scooter']);
+        const K2L_WARNING = '⚠️ No safe cycling route — K2L path not complete until 2027/28 (subject to WCC review)';
+
         const subHtml = r.subOptions.map(opt => {
-          const unavail = !opt.available;
+          const k2lBlock = isK2LRoute && CYCLING_SERVICES.has(opt.service);
+          const unavail = !opt.available || k2lBlock;
+          const noteText = k2lBlock ? K2L_WARNING : (unavail ? '⚠️ Not available on this route' : opt.notes);
           return `
             <div class="accordion-sub${unavail ? ' unavailable' : ''}">
               <div style="flex:1; min-width:0;">
                 <div style="font-weight:600; color:#003366;">${opt.icon} ${opt.name}</div>
-                <div style="color:#999; font-size:11px; margin-top:2px;">${unavail ? '⚠️ Not available on this route' : opt.notes}</div>
-                <div style="font-size:11px; color:#16A34A; margin-top:2px;">🌱 ${opt.co2.toFixed(1)} kg CO₂</div>
+                <div style="color:#999; font-size:11px; margin-top:2px;">${noteText}</div>
+                <div style="font-size:11px; color:${unavail ? '#bbb' : '#16A34A'}; margin-top:2px;">🌱 ${opt.co2.toFixed(1)} kg CO₂</div>
               </div>
               <div style="text-align:right; flex-shrink:0;">
                 <div style="font-size:13px; font-weight:700; color:#16A34A;">£${opt.cost.toFixed(2)}</div>
@@ -1691,6 +1757,16 @@
       `;
     }
 
+    // ── Late service warning banners ────────────────────────────────
+    const warningStyle = 'background:#FEE2E2;color:#991B1B;border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:0.85em;';
+    let warningBannersHtml = '';
+    if (userHour >= 23 && routes.some(r => r.service === 'bus')) {
+      warningBannersHtml += `<div style="${warningStyle}">⚠️ Late night: bus services may have ended. Check live times before travelling.</div>`;
+    }
+    if (userHour >= 22 && fromName.toLowerCase().includes('kenilworth')) {
+      warningBannersHtml += `<div style="${warningStyle}">⚠️ Last Kenilworth train typically around 22:00–23:00 — check timetable before travelling.</div>`;
+    }
+
     // Render instant cards, then divider (if plan-ahead services exist), then plan-ahead cards
     const dividerHtml = planAheadRoutes.length > 0 ? `
       <div class="results-divider">
@@ -1698,6 +1774,7 @@
       </div>` : '';
 
     cardsDiv.innerHTML =
+      warningBannersHtml +
       instantRoutes.map((r, idx) => renderCard(r, idx)).join('') +
       dividerHtml +
       planAheadRoutes.map((r, idx) => renderCard(r, instantRoutes.length + idx)).join('');
