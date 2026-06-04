@@ -455,13 +455,13 @@
   function getCostEstimate(service) {
     const estimates = {
       bus:     { range: '£2.50 single · £5.00 return', note: 'UniRider pass available' },
-      train:   { range: '£3.80–£6.50 single',          note: '16-25 Railcard saves 1/3' },
-      lime:    { range: '£1.00 unlock + £0.20/min',             note: 'Free first 30 min with UniRider · Lime app' },
-      uber:    { range: '£8–14 estimated',              note: null },
-      taxi:    { range: '£8–14 estimated',              note: null },
+      train:   { range: 'Adult single — see card',       note: '16-25 Railcard saves 1/3' },
+      lime:    { range: '£1.00 unlock + £0.15/min (WMCA rate)', note: 'Free first 30 min with UniRider' },
+      uber:    { range: 'Estimate only',                note: 'Surge pricing may apply · estimate only' },
+      taxi:    { range: 'Estimate only',                note: 'Surge pricing may apply · estimate only' },
       walk:          { range: '£0',                                   note: null },
       cycling:       { range: '£0',                                   note: null },
-      'lime-scooter':{ range: '£1.00 unlock + £0.25/min',             note: 'Free first 30 min with UniRider · Lime app' },
+      'lime-scooter':{ range: '£1.00 unlock + £0.20/min (WMCA rate)',   note: null },
       hiyacar:       { range: '~£6.50/hr (car club)',                  note: 'Book via HiyaCar app' },
       blablacar:     { range: '~£0.06–0.10/km (shared ride)',          note: 'Book via BlaBlaCar app' },
       indiogo:       { range: '£2.50 per journey',                     note: 'Dial-a-ride service' },
@@ -880,101 +880,101 @@
       { route: 'Uber',     cost: 9.50, time: 18, reliability: 90, notes: 'Direct',                                                   service: 'uber',  co2: 1.4 }
     ],
     'kenilworth|coventry-city': [
-      { route: 'Bus',   cost: 2.50, time: 32, reliability: 85, notes: 'Via Coventry city centre',                                    service: 'bus',   co2: 0.7 },
-      { route: 'Train', cost: 2.60, time: 10, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services', service: 'train', co2: 0.3 },
-      { route: 'Uber',  cost: 12.00,time: 18, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+      { route: 'Bus',   cost: 2.40, time: 32, reliability: 85, notes: 'Via Coventry city centre',                                                    service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 3.80, time: 10, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services · 16-25 Railcard saves 1/3', service: 'train', co2: 0.3 },
+      { route: 'Uber',  cost: 12.00,time: 18, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth-station|coventry-city': [
-      { route: 'Bus',   cost: 2.50, time: 32, reliability: 85, notes: 'Via Coventry city centre',                                    service: 'bus',   co2: 0.7 },
-      { route: 'Train', cost: 2.60, time: 10, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services', service: 'train', co2: 0.3 },
-      { route: 'Uber',  cost: 12.00,time: 18, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+      { route: 'Bus',   cost: 2.40, time: 32, reliability: 85, notes: 'Via Coventry city centre',                                                    service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 3.80, time: 10, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services · 16-25 Railcard saves 1/3', service: 'train', co2: 0.3 },
+      { route: 'Uber',  cost: 12.00,time: 18, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth|coventry-train': [
-      { route: 'Train', cost: 2.60, time: 10, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services', service: 'train', co2: 0.3 },
-      { route: 'Uber',  cost: 12.00,time: 18, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+      { route: 'Train', cost: 3.80, time: 10, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services · 16-25 Railcard saves 1/3', service: 'train', co2: 0.3 },
+      { route: 'Uber',  cost: 12.00,time: 18, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth-station|coventry-train': [
-      { route: 'Bus',   cost: 2.50, time: 28, reliability: 85, notes: 'National Express 11 or Stagecoach X17 · every 15-30 min',    service: 'bus',   co2: 0.7 },
-      { route: 'Train', cost: 2.60, time: 10, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services', service: 'train', co2: 0.3 },
-      { route: 'Uber',  cost: 12.00,time: 18, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+      { route: 'Bus',   cost: 2.40, time: 28, reliability: 85, notes: 'National Express 11 or Stagecoach X17 · every 15-30 min',                     service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 3.80, time: 10, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services · 16-25 Railcard saves 1/3', service: 'train', co2: 0.3 },
+      { route: 'Uber',  cost: 12.00,time: 18, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth|leamington-town': [
-      { route: 'Bus',   cost: 2.50, time: 25, reliability: 80, notes: 'Via Leamington',                                             service: 'bus',   co2: 0.7 },
-      { route: 'Train', cost: 2.60, time:  8, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services', service: 'train', co2: 0.2 },
-      { route: 'Uber',  cost: 11.00,time: 15, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+      { route: 'Bus',   cost: 2.40, time: 25, reliability: 80, notes: 'Via Leamington',                                                              service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 3.80, time:  8, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services · 16-25 Railcard saves 1/3', service: 'train', co2: 0.2 },
+      { route: 'Uber',  cost: 13.00,time: 15, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth-station|leamington-town': [
-      { route: 'Bus',   cost: 2.50, time: 20, reliability: 80, notes: 'National Express 11 · frequent service',                      service: 'bus',   co2: 0.7 },
-      { route: 'Train', cost: 2.60, time:  8, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services', service: 'train', co2: 0.2 },
-      { route: 'Uber',  cost: 11.00,time: 15, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+      { route: 'Bus',   cost: 2.40, time: 20, reliability: 80, notes: 'National Express 11 · frequent service',                                      service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 3.80, time:  8, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services · 16-25 Railcard saves 1/3', service: 'train', co2: 0.2 },
+      { route: 'Uber',  cost: 13.00,time: 15, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth|leamington-train': [
-      { route: 'Bus',   cost: 2.50, time: 20, reliability: 80, notes: 'National Express 11 · frequent service',                      service: 'bus',   co2: 0.7 },
-      { route: 'Train', cost: 2.60, time:  8, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services', service: 'train', co2: 0.2 },
-      { route: 'Uber',  cost: 11.00,time: 15, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+      { route: 'Bus',   cost: 2.40, time: 20, reliability: 80, notes: 'National Express 11 · frequent service',                                      service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 3.80, time:  8, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services · 16-25 Railcard saves 1/3', service: 'train', co2: 0.2 },
+      { route: 'Uber',  cost: 13.00,time: 15, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth-station|leamington-train': [
-      { route: 'Bus',   cost: 2.50, time: 20, reliability: 80, notes: 'National Express 11 · frequent service',                      service: 'bus',   co2: 0.7 },
-      { route: 'Train', cost: 2.60, time:  8, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services', service: 'train', co2: 0.2 },
-      { route: 'Uber',  cost: 11.00,time: 15, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+      { route: 'Bus',   cost: 2.40, time: 20, reliability: 80, notes: 'National Express 11 · frequent service',                                      service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 3.80, time:  8, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services · 16-25 Railcard saves 1/3', service: 'train', co2: 0.2 },
+      { route: 'Uber',  cost: 13.00,time: 15, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth|warwick-town': [
-      { route: 'Bus',   cost: 2.50, time: 28, reliability: 80, notes: 'Via town centre',                                            service: 'bus',   co2: 0.7 },
-      { route: 'Train', cost: 3.20, time: 22, reliability: 78, notes: 'Change at Leamington Spa · check timetable for Sunday services', service: 'train', co2: 0.4 },
-      { route: 'Uber',  cost: 10.00,time: 14, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+      { route: 'Bus',   cost: 2.40, time: 28, reliability: 80, notes: 'Via town centre',                                                             service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 5.20, time: 22, reliability: 78, notes: 'Change at Leamington Spa · 16-25 Railcard saves 1/3 · check timetable for Sunday services', service: 'train', co2: 0.4 },
+      { route: 'Uber',  cost: 10.50,time: 14, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth-station|warwick-town': [
-      { route: 'Bus',   cost: 2.50, time: 28, reliability: 80, notes: 'National Express 11 or Stagecoach X17 · every 15-30 min',    service: 'bus',   co2: 0.7 },
-      { route: 'Train', cost: 3.20, time: 22, reliability: 78, notes: 'Change at Leamington Spa · check timetable for Sunday services', service: 'train', co2: 0.4 },
-      { route: 'Uber',  cost: 10.00,time: 14, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+      { route: 'Bus',   cost: 2.40, time: 28, reliability: 80, notes: 'National Express 11 or Stagecoach X17 · every 15-30 min',                     service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 5.20, time: 22, reliability: 78, notes: 'Change at Leamington Spa · 16-25 Railcard saves 1/3 · check timetable for Sunday services', service: 'train', co2: 0.4 },
+      { route: 'Uber',  cost: 10.50,time: 14, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth-station|warwick-station': [
-      { route: 'Bus',   cost: 2.50, time: 28, reliability: 80, notes: 'National Express 11 or Stagecoach X17 · every 15-30 min',    service: 'bus',   co2: 0.7 },
-      { route: 'Train', cost: 3.20, time: 22, reliability: 78, notes: 'Change at Leamington Spa · check timetable for Sunday services', service: 'train', co2: 0.4 },
-      { route: 'Uber',  cost: 10.00,time: 14, reliability: 92, notes: 'Direct',                                                     service: 'uber',  co2: 1.4 }
+      { route: 'Bus',   cost: 2.40, time: 28, reliability: 80, notes: 'National Express 11 or Stagecoach X17 · every 15-30 min',                     service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 5.20, time: 22, reliability: 78, notes: 'Change at Leamington Spa · 16-25 Railcard saves 1/3 · check timetable for Sunday services', service: 'train', co2: 0.4 },
+      { route: 'Uber',  cost: 10.50,time: 14, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     // ── Demo corridors ────────────────────────────────────────────
     // UoW → Coventry City Centre (~4.6km)
     'uow|coventry-city': [
-      { route: 'Bus (U1/U2)', cost: 2.50, time: 20, reliability: 88, notes: 'U1/U2 to city centre',                  service: 'bus',   co2: 0.7 },
-      { route: 'Train',        cost: 3.50, time: 25, reliability: 82, notes: 'Walk to Canley (~15 min) + 8 min train',service: 'train', co2: 0.4 },
-      { route: 'Lime Bike',    cost: 5.00, time: 20, reliability: 85, notes: 'Cycle route',                           service: 'lime',  co2: 0.0 },
-      { route: 'Uber',         cost: 9.00, time: 12, reliability: 92, notes: 'Door-to-door',                          service: 'uber',  co2: 1.4 }
+      { route: 'Bus (U1/U2)', cost: 2.40, time: 20, reliability: 88, notes: 'U1/U2 to city centre',                                        service: 'bus',   co2: 0.7 },
+      { route: 'Train',        cost: 4.50, time: 25, reliability: 82, notes: 'Walk to Canley (~15 min) + 8 min train · 16-25 Railcard saves 1/3', service: 'train', co2: 0.4 },
+      { route: 'Lime Bike',    cost: 4.00, time: 20, reliability: 85, notes: 'Cycle route',                                                 service: 'lime',  co2: 0.0 },
+      { route: 'Uber',         cost: 8.00, time: 12, reliability: 92, notes: 'Surge pricing may apply · estimate only',                     service: 'uber',  co2: 1.4 }
     ],
     // UoW → Coventry Train Station (~4.6km)
     'uow|coventry-train': [
-      { route: 'Bus (U1/U2)', cost: 2.50, time: 20, reliability: 88, notes: 'U1/U2 to city centre',                  service: 'bus',   co2: 0.7 },
-      { route: 'Train',        cost: 3.50, time: 25, reliability: 82, notes: 'Walk to Canley (~15 min) + 8 min train',service: 'train', co2: 0.4 },
-      { route: 'Lime Bike',    cost: 5.00, time: 20, reliability: 85, notes: 'Cycle route',                           service: 'lime',  co2: 0.0 },
-      { route: 'Uber',         cost: 9.00, time: 12, reliability: 92, notes: 'Door-to-door',                          service: 'uber',  co2: 1.4 }
+      { route: 'Bus (U1/U2)', cost: 2.40, time: 20, reliability: 88, notes: 'U1/U2 to city centre',                                        service: 'bus',   co2: 0.7 },
+      { route: 'Train',        cost: 4.50, time: 25, reliability: 82, notes: 'Walk to Canley (~15 min) + 8 min train · 16-25 Railcard saves 1/3', service: 'train', co2: 0.4 },
+      { route: 'Lime Bike',    cost: 4.00, time: 20, reliability: 85, notes: 'Cycle route',                                                 service: 'lime',  co2: 0.0 },
+      { route: 'Uber',         cost: 8.00, time: 12, reliability: 92, notes: 'Surge pricing may apply · estimate only',                     service: 'uber',  co2: 1.4 }
     ],
     // UoW → Leamington Spa Town Centre (~10.4km)
     'uow|leamington-town': [
-      { route: 'Bus (U2)',        cost: 2.50, time: 42, reliability: 82, notes: 'U2 direct to Leamington',            service: 'bus',   co2: 0.7 },
-      { route: 'Train',           cost: 5.20, time: 52, reliability: 75, notes: 'Walk to Canley + change at Coventry',service: 'train', co2: 0.6 },
-      { route: 'Lime Bike',       cost: 9.40, time: 42, reliability: 80, notes: 'Long cycle route',                   service: 'lime',  co2: 0.0 },
-      { route: 'Uber',            cost: 23.00,time: 22, reliability: 92, notes: 'Direct',                             service: 'uber',  co2: 1.4 }
+      { route: 'Bus (U2)',        cost: 2.40, time: 42, reliability: 82, notes: 'U2 direct to Leamington',                                  service: 'bus',   co2: 0.7 },
+      { route: 'Train',           cost: 6.50, time: 52, reliability: 75, notes: 'Walk to Canley + change at Coventry · 16-25 Railcard saves 1/3', service: 'train', co2: 0.6 },
+      { route: 'Lime Bike',       cost: 0,    time: 42, reliability: 80, notes: 'Long cycle route — free with UniRider',                    service: 'lime',  co2: 0.0 },
+      { route: 'Uber',            cost: 14.00,time: 22, reliability: 92, notes: 'Surge pricing may apply · estimate only',                  service: 'uber',  co2: 1.4 }
     ],
     // UoW → Leamington Spa Train Station (~10.4km — station is destination, no extra walk)
     'uow|leamington-train': [
-      { route: 'Bus (U2)', cost: 2.50, time: 45, reliability: 82, notes: 'U2 to Leamington',                          service: 'bus',   co2: 0.7 },
-      { route: 'Train',    cost: 5.20, time: 52, reliability: 75, notes: 'Walk to Canley + change at Coventry',        service: 'train', co2: 0.6 },
-      { route: 'Cycle',    cost: 0,    time: 42, reliability: 85, notes: 'Cycle route',                                service: 'lime',  co2: 0.0 },
-      { route: 'Uber',     cost: 18.00,time: 20, reliability: 92, notes: 'Direct',                                     service: 'uber',  co2: 1.4 }
+      { route: 'Bus (U2)', cost: 2.40, time: 45, reliability: 82, notes: 'U2 to Leamington',                                               service: 'bus',   co2: 0.7 },
+      { route: 'Train',    cost: 6.50, time: 52, reliability: 75, notes: 'Walk to Canley + change at Coventry · 16-25 Railcard saves 1/3',  service: 'train', co2: 0.6 },
+      { route: 'Cycle',    cost: 0,    time: 42, reliability: 85, notes: 'Cycle route',                                                     service: 'lime',  co2: 0.0 },
+      { route: 'Uber',     cost: 14.00,time: 20, reliability: 92, notes: 'Surge pricing may apply · estimate only',                         service: 'uber',  co2: 1.4 }
     ],
     // UoW → Warwick Parkway Station (~8km — no direct train from Canley)
     'uow|warwick-parkway': [
-      { route: 'Bus',   cost: 2.50, time: 32, reliability: 85, notes: 'Bus via Warwick town',                         service: 'bus',   co2: 0.7 },
-      { route: 'Train', cost: 3.20, time: 48, reliability: 75, notes: 'Walk to Canley + change at Coventry',          service: 'train', co2: 0.3 },
-      { route: 'Cycle', cost: 0,    time: 30, reliability: 88, notes: 'Cycle via greenway',                           service: 'lime',  co2: 0.0 },
-      { route: 'Uber',  cost: 15.00,time: 15, reliability: 92, notes: 'Direct',                                       service: 'uber',  co2: 1.4 }
+      { route: 'Bus',   cost: 2.40, time: 32, reliability: 85, notes: 'Bus via Warwick town',                                              service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 4.80, time: 48, reliability: 75, notes: 'Walk to Canley + change at Coventry · 16-25 Railcard saves 1/3',   service: 'train', co2: 0.3 },
+      { route: 'Cycle', cost: 0,    time: 30, reliability: 88, notes: 'Cycle via greenway',                                               service: 'lime',  co2: 0.0 },
+      { route: 'Uber',  cost: 11.50,time: 15, reliability: 92, notes: 'Surge pricing may apply · estimate only',                          service: 'uber',  co2: 1.4 }
     ],
     // Kenilworth → Warwick Station (~7km)
     'kenilworth|warwick-station': [
-      { route: 'X17 Bus', cost: 2.50, time: 32, reliability: 80, notes: 'X17 direct',                                               service: 'bus',   co2: 0.7 },
-      { route: 'Train',   cost: 3.20, time: 22, reliability: 78, notes: 'Change at Leamington Spa · check timetable for Sunday services', service: 'train', co2: 0.4 },
-      { route: 'Cycle',   cost: 0,    time: 28, reliability: 85, notes: 'Cycle route',                                               service: 'lime',  co2: 0.0 },
-      { route: 'Uber',    cost: 13.00,time: 16, reliability: 92, notes: 'Direct',                                                    service: 'uber',  co2: 1.4 }
+      { route: 'X17 Bus', cost: 2.40, time: 32, reliability: 80, notes: 'X17 direct',                                                     service: 'bus',   co2: 0.7 },
+      { route: 'Train',   cost: 5.20, time: 22, reliability: 78, notes: 'Change at Leamington Spa · 16-25 Railcard saves 1/3 · check timetable for Sunday services', service: 'train', co2: 0.4 },
+      { route: 'Cycle',   cost: 0,    time: 28, reliability: 85, notes: 'Cycle route',                                                    service: 'lime',  co2: 0.0 },
+      { route: 'Uber',    cost: 10.50,time: 16, reliability: 92, notes: 'Surge pricing may apply · estimate only',                        service: 'uber',  co2: 1.4 }
     ]
   };
   
@@ -1307,6 +1307,25 @@
     document.getElementById('safeMode').classList.add('active');
     document.getElementById('safe-return-section').classList.add('expanded');
   }
+  // Auto-activate Safe Return when journey time changes to ≥ 22:00
+  document.getElementById('journey-time').addEventListener('change', (e) => {
+    const hour = parseInt(e.target.value.split(':')[0]);
+    if (hour >= 22 || hour < 6) {
+      if (!state.safeMode) {
+        state.safeMode = true;
+        state.autoSafeMode = true;
+        document.getElementById('safeMode').classList.add('active');
+        document.getElementById('safe-return-section').classList.add('expanded');
+        const banner = document.getElementById('late-night-banner');
+        if (banner) {
+          banner.textContent = 'Auto-enabled for late night travel 🔒';
+          banner.style.display = 'block';
+        }
+        render();
+      }
+    }
+  });
+
   // Route Planner is the default tab — ensure correct DOM state
   document.getElementById('planner-content').style.display = 'block';
   document.getElementById('map-content').style.display = 'none';
@@ -1441,15 +1460,15 @@
     const limeBikeTime     = Math.round(personalBikeTime * 0.80); // e-assist is ~20% faster
     const isKenilworthRoute = ['kenilworth', 'kenilworth-station'].includes(fromLoc.id) ||
                               ['kenilworth', 'kenilworth-station'].includes(toLoc.id);
+    // WMCA contract rates: bike £1.00 + £0.15/min, scooter £1.00 + £0.20/min
+    // UniRider gives first 30 min free on BIKE ONLY (not scooter)
     const _uniRider = state.wallet.unirider;
-    const _limeBikeRaw = parseFloat((1.00 + limeBikeTime * 0.20).toFixed(2));
-    const _limeScooterRaw = parseFloat((1.00 + scooterTime * 0.25).toFixed(2));
-    const limeBikeCostFinal = _uniRider
-      ? (limeBikeTime <= 30 ? 0.00 : parseFloat((1.00 + (limeBikeTime - 30) * 0.20).toFixed(2)))
+    const _limeBikeRaw       = parseFloat((1.00 + limeBikeTime * 0.15).toFixed(2));
+    const _limeScooterRaw    = parseFloat((1.00 + scooterTime  * 0.20).toFixed(2));
+    const limeBikeCostFinal  = _uniRider
+      ? (limeBikeTime <= 30 ? 0.00 : parseFloat((1.00 + (limeBikeTime - 30) * 0.15).toFixed(2)))
       : _limeBikeRaw;
-    const limeScooterCostFinal = _uniRider
-      ? (scooterTime <= 30 ? 0.00 : parseFloat((1.00 + (scooterTime - 30) * 0.25).toFixed(2)))
-      : _limeScooterRaw;
+    const limeScooterCostFinal = _limeScooterRaw; // UniRider does NOT apply to scooters
     routesWithAvailability.push({
       type: 'accordion', accordionId: 'bikes-scooters',
       route: 'Bikes & Scooters',
@@ -1457,8 +1476,8 @@
       service: 'cycling', cost: 0, time: personalBikeTime, co2: 0.0, reliability: 95, limeUnavailable: false,
       subOptions: [
         { icon: '🚴', name: 'Personal bike', cost: 0,                time: personalBikeTime, co2: 0.0, notes: 'Your own bike — no cost, no app needed',           service: 'cycling',      available: true },
-        { icon: '🚲', name: 'Lime Bike',      cost: limeBikeCostFinal,    time: limeBikeTime,     co2: 0.0, notes: 'Free first 30 min with UniRider · Lime app', service: 'lime',         available: limeAvailHere },
-        { icon: '🛴', name: 'Lime Scooter',   cost: limeScooterCostFinal, time: scooterTime,      co2: 0.2, notes: 'Free first 30 min with UniRider · Lime app', service: 'lime-scooter', available: limeAvailHere },
+        { icon: '🚲', name: 'Lime Bike',    cost: limeBikeCostFinal,    time: limeBikeTime, co2: 0.0, notes: _uniRider && limeBikeTime <= 30 ? 'Free with UniRider · Electric-assisted' : 'Electric-assisted · £1.00 + £0.15/min (WMCA rate) · Free first 30 min with UniRider', service: 'lime',         available: limeAvailHere },
+        { icon: '🛴', name: 'Lime Scooter', cost: limeScooterCostFinal, time: scooterTime,  co2: 0.2, notes: '£1.00 unlock + £0.20/min (WMCA rate) · Lime app required',                                                                                                         service: 'lime-scooter', available: limeAvailHere },
         ...(isKenilworthRoute ? [{ icon: '🚲', name: 'Brompton hire', cost: 5.00, time: personalBikeTime, co2: 0.0, notes: 'Hire from Kenilworth Station · £5/day', service: 'cycling', available: true }] : [])
       ]
     });
@@ -1772,6 +1791,30 @@
       `;
     }
 
+    // ── Nudge to leave now ──────────────────────────────────────────
+    let nudgeBannerHtml = '';
+    if (routes.length > 0 && s.time) {
+      const topRoute = routes[0]; // already smart-sorted
+      const topTime  = topRoute.time || 0;
+      const [selH, selM] = s.time.split(':').map(Number);
+      const selTotal  = selH * 60 + selM;
+      const leaveTotal = selTotal - topTime;
+      const leaveH = Math.floor(((leaveTotal % 1440) + 1440) % 1440 / 60);
+      const leaveM = ((leaveTotal % 60) + 60) % 60;
+      const now = new Date();
+      const nowTotal = now.getHours() * 60 + now.getMinutes();
+      const diffToSelected = selTotal - nowTotal;
+      const nudgeStyle = 'background:#6B21A8;color:#FFFFFF;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:0.9em;display:block;';
+      if (Math.abs(diffToSelected) <= 15) {
+        const arrTotal = nowTotal + topTime;
+        const arrH = Math.floor((arrTotal % 1440) / 60);
+        const arrM = arrTotal % 60;
+        nudgeBannerHtml = `<div style="${nudgeStyle}">🕐 Leave now to arrive by ${formatTime(arrH, arrM)}</div>`;
+      } else {
+        nudgeBannerHtml = `<div style="${nudgeStyle}">🕐 Leave by ${formatTime(leaveH, leaveM)} to arrive on time</div>`;
+      }
+    }
+
     // ── Late service warning banners ────────────────────────────────
     const warningStyle = 'background:#FEE2E2;color:#991B1B;border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:0.85em;';
     let warningBannersHtml = '';
@@ -1789,6 +1832,7 @@
       </div>` : '';
 
     cardsDiv.innerHTML =
+      nudgeBannerHtml +
       warningBannersHtml +
       instantRoutes.map((r, idx) => renderCard(r, idx)).join('') +
       dividerHtml +
