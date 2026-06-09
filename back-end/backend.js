@@ -336,6 +336,16 @@ app.post('/api/log-travel', express.json(), (req, res) => {
   res.status(200).json({ ok: true });
 });
 
+// ── Lime interest logging ─────────────────────────────────────
+const LIME_INTEREST_LOG = path.join(__dirname, 'lime-interest.json');
+
+app.post('/api/log-lime-interest', express.json(), (req, res) => {
+  try {
+    fs.appendFileSync(LIME_INTEREST_LOG, JSON.stringify(req.body) + '\n', 'utf8');
+  } catch (_) {}
+  res.status(200).json({ ok: true });
+});
+
 // ── Health check ─────────────────────────────────────────────
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
