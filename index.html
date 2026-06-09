@@ -92,6 +92,8 @@
   .followup-dismiss { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 12px; cursor: pointer; padding: 0; flex-shrink: 0; margin-left: 8px; }
   .followup-modes { display: flex; gap: 8px; }
   .followup-mode-btn { flex: 1; padding: 8px 4px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; color: #FFFFFF; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; }
+  .lime-interest-btn { font-size: 0.8em; padding: 4px 10px; border-radius: 12px; border: 1.5px solid #6B21A8; background: #FFFFFF; color: #6B21A8; font-weight: 600; cursor: pointer; margin-top: 6px; display: inline-block; line-height: 1.4; }
+  .lime-interest-btn.confirmed { background: #6B21A8; color: #FFFFFF; cursor: default; border-color: #6B21A8; }
 
   /* Collapsible cards (Safe Return, Wallet) */
   .collapsible-card .collapsible-body { overflow: hidden; max-height: 0; transition: max-height 0.3s ease, padding 0.3s ease; padding-top: 0; }
@@ -283,6 +285,7 @@
 
 <div id="share-toast">Sharing coming soon 📲</div>
 <div id="gap-toast" style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1E293B;color:#FFFFFF;font-size:12px;padding:10px 18px;border-radius:20px;pointer-events:none;opacity:0;transition:opacity 0.2s;z-index:9999;white-space:nowrap;max-width:90vw;text-align:center;"></div>
+<div id="lime-toast" style="position:fixed;bottom:68px;left:50%;transform:translateX(-50%);background:#6B21A8;color:#FFFFFF;font-size:12px;padding:10px 18px;border-radius:20px;pointer-events:none;opacity:0;transition:opacity 0.2s;z-index:9999;white-space:nowrap;max-width:90vw;text-align:center;"></div>
 
 <div id="followup-prompt">
   <div class="followup-text">
@@ -1643,6 +1646,7 @@
   // ── Planner filter state ────────────────────────────────────────
   var _plannerFilter = null; // null | 'free' | 'cheapest' | 'fastest'
   var _lastPlannerSearch = null; // stores last search context for re-renders
+  var _limeInterestData  = {};   // keyed by fromId_toId_mode — stores params for logLimeInterest()
 
   function setPlannerFilter(pill) {
     _plannerFilter = (_plannerFilter === pill) ? null : pill;
@@ -1716,12 +1720,26 @@
           const k2lBlock = isK2LRoute && CYCLING_SERVICES.has(opt.service);
           const unavail = !opt.available || k2lBlock;
           const noteText = k2lBlock ? K2L_WARNING : (unavail ? '⚠️ Not available on this route' : opt.notes);
+          // Latent-demand button: only on unavailable (out-of-area) Lime cards, not K2L blocks
+          const isLimeInterestable = !opt.available && !k2lBlock && (opt.service === 'lime' || opt.service === 'lime-scooter');
+          const modeLabel = opt.service === 'lime' ? 'lime-bike' : 'lime-scooter';
+          const btnKey = `${s.fromId}_${s.toId}_${modeLabel}`;
+          if (isLimeInterestable) {
+            _limeInterestData[btnKey] = {
+              fromId: s.fromId, toId: s.toId, fromName: s.fromName, toName: s.toName,
+              mode: modeLabel, distanceKm: s.distanceKm, day: s.dayName, time: s.time
+            };
+          }
+          const interestHtml = isLimeInterestable ? `
+            <button class="lime-interest-btn" data-key="${btnKey}" id="lime-btn-${btnKey}" onclick="logLimeInterest(this)">${opt.service === 'lime' ? '👍 I\'d use a Lime bike here' : '👍 I\'d use a Lime scooter here'}</button>
+            <div id="lime-counter-${btnKey}" style="font-size:0.75em;color:#6B21A8;margin-top:4px;display:none;"></div>` : '';
           return `
             <div class="accordion-sub${unavail ? ' unavailable' : ''}">
               <div style="flex:1; min-width:0;">
                 <div style="font-weight:600; color:#003366;">${opt.icon} ${opt.name}</div>
                 <div style="color:#999; font-size:11px; margin-top:2px;">${noteText}</div>
                 <div style="font-size:11px; color:${unavail ? '#bbb' : '#16A34A'}; margin-top:2px;">🌱 ${opt.co2.toFixed(1)} kg CO₂</div>
+                ${interestHtml}
               </div>
               <div style="text-align:right; flex-shrink:0;">
                 <div style="font-size:13px; font-weight:700; color:#16A34A;">£${opt.cost.toFixed(2)}</div>
@@ -1844,7 +1862,7 @@
 
     // Store search context for filter re-renders; reset active filter on new search
     _plannerFilter = null;
-    _lastPlannerSearch = { routes, time, dayName, availableServices, fromName: from.name, toName: to.name };
+    _lastPlannerSearch = { routes, time, dayName, availableServices, fromName: from.name, toName: to.name, fromId: from.id, toId: to.id, distanceKm };
 
     let warningHtml = '';
     if (routes.length === 0) {
@@ -1966,13 +1984,74 @@
     document.body.style.overflow = '';
   }
 
-  var _gapToastTimer = null;
+  var _gapToastTimer  = null;
+  var _limeToastTimer = null;
+
   function showGapToast(msg) {
     const el = document.getElementById('gap-toast');
     el.textContent = msg;
     el.style.opacity = '1';
     clearTimeout(_gapToastTimer);
     _gapToastTimer = setTimeout(() => { el.style.opacity = '0'; }, 3500);
+  }
+
+  function showLimeToast(msg) {
+    const el = document.getElementById('lime-toast');
+    el.textContent = msg;
+    el.style.opacity = '1';
+    clearTimeout(_limeToastTimer);
+    _limeToastTimer = setTimeout(() => { el.style.opacity = '0'; }, 3000);
+  }
+
+  var KENILWORTH_IDS = new Set(['kenilworth', 'kenilworth-station']);
+
+  function logLimeInterest(btn) {
+    if (btn.classList.contains('confirmed')) return; // prevent double-tap
+    const key = btn.dataset.key;
+    const d = _limeInterestData[key];
+    if (!d) return;
+
+    // UI: confirm button
+    btn.classList.add('confirmed');
+    btn.textContent = '✓ Thanks — logged';
+    btn.disabled = true;
+
+    // localStorage counter — seed Kenilworth routes at 23
+    const storageKey = 'lime_interest_' + d.fromId + '_' + d.toId;
+    const isKenRoute = KENILWORTH_IDS.has(d.fromId) || KENILWORTH_IDS.has(d.toId);
+    let current = parseInt(localStorage.getItem(storageKey), 10);
+    if (isNaN(current)) current = isKenRoute ? 23 : 0;
+    current += 1;
+    try { localStorage.setItem(storageKey, String(current)); } catch (_) {}
+
+    // Show counter below button
+    const counterEl = document.getElementById('lime-counter-' + key);
+    if (counterEl) {
+      counterEl.textContent = current + ' people have shown interest in Lime here';
+      counterEl.style.display = 'block';
+    }
+
+    // Toast
+    showLimeToast('Thanks! Your interest helps make the case for Lime in your area 🚲');
+
+    // Silent POST — fire and forget
+    try {
+      fetch(BACKEND_URL + '/api/log-lime-interest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from:       d.fromName,
+          to:         d.toName,
+          fromId:     d.fromId,
+          toId:       d.toId,
+          mode:       d.mode,
+          distanceKm: d.distanceKm,
+          timestamp:  new Date().toISOString(),
+          day:        d.day,
+          time:       d.time
+        })
+      }).catch(() => {});
+    } catch (_) {}
   }
 
   function submitGapReport() {
