@@ -420,7 +420,7 @@
       options: [
         { id: "bus_12x", name: "NX 12X", cost: 2.5, time: 35, notes: "Direct via Kenilworth Rd (BODS)", service: "bus" },
         { id: "bus_u1", name: "Stagecoach U1", cost: 2.5, time: 45, notes: "Campus route (TfWM)", service: "bus" },
-        { id: "lime", name: "Lime e-Bike", cost: 5.40, time: 22, notes: "Live availability (Lime)", service: "lime" },
+        { id: "lime", name: "Lime e-Bike", cost: 5.40, time: 22, notes: "Electric-assisted · Lime app required", service: "lime" },
         { id: "uber_solo", name: "Uber", cost: 8.5, time: 12, notes: "Door-to-door", service: "uber" },
         { id: "walk", name: "Walking", cost: 0, time: 75, notes: "75 min walk", service: "walk" }
       ]
@@ -459,12 +459,12 @@
     const estimates = {
       bus:     { range: '£2.50 single · £5.00 return', note: 'UniRider pass available' },
       train:   { range: 'Adult single — see card',       note: '16-25 Railcard saves 1/3' },
-      lime:    { range: '£1.00 unlock + £0.15/min (WMCA rate)', note: 'Free first 30 min with UniRider' },
+      lime:    { range: '£1.00 unlock + £0.15/min (WMCA rate)', note: 'Electric-assisted · Lime app required' },
       uber:    { range: 'Estimate only',                note: 'Surge pricing may apply · estimate only' },
       taxi:    { range: 'Estimate only',                note: 'Surge pricing may apply · estimate only' },
       walk:          { range: '£0',                                   note: null },
       cycling:       { range: '£0',                                   note: null },
-      'lime-scooter':{ range: '£1.00 unlock + £0.20/min (WMCA rate)',   note: null },
+      'lime-scooter':{ range: '£1.00 unlock + £0.20/min (WMCA rate)',   note: 'Lime app required · helmet recommended' },
       hiyacar:       { range: '~£6.50/hr (car club)',                  note: 'Book via HiyaCar app' },
       blablacar:     { range: '~£0.06–0.10/km (shared ride)',          note: 'Book via BlaBlaCar app' },
       indiogo:       { range: '£2.50 per journey',                     note: 'Dial-a-ride service' },
@@ -983,7 +983,7 @@
   
   // ── Service area config — must be defined before runPlannerSearch/initDemoMode ──
   var SERVICE_AREAS = {
-    'lime-scooter': ['University of Warwick', 'Coventry Train Station', 'Earlsdon, Coventry'],
+    'lime-scooter': ['University of Warwick', 'Coventry City Centre'],
     'lime-bike':    ['University of Warwick', 'Coventry Train Station', 'Earlsdon, Coventry'],
     'indiego':      ['Kenilworth Town Centre', 'University of Warwick'],
     'coventry-drt': ['Coventry Train Station', 'Earlsdon, Coventry'],
@@ -1060,21 +1060,37 @@
     });
 
     // ── Lime Coverage Overlay ──────────────────────────────────────
-    limeCoverageLayer = L.layerGroup();
+    const LIME_BIKE_COVENTRY = L.polygon([
+      [52.4400, -1.5500],
+      [52.4300, -1.4700],
+      [52.3900, -1.4600],
+      [52.3600, -1.4900],
+      [52.3700, -1.5600],
+      [52.3850, -1.5800],
+      [52.4100, -1.5800],
+    ], { color: '#16a34a', fillColor: '#16a34a',
+         fillOpacity: 0.15, weight: 2,
+         dashArray: '6,4' });
 
-    // Coverage polygon (WMCA scheme: UoW campus + CV1-CV6)
-    L.polygon([
-      [52.3900, -1.5700],
-      [52.4100, -1.4800],
-      [52.3800, -1.4400],
-      [52.3400, -1.4600],
-      [52.3200, -1.5100],
-      [52.3600, -1.5700],
-      [52.3750, -1.5900]
-    ], {
-      color: '#16a34a', fillColor: '#16a34a',
-      fillOpacity: 0.15, weight: 2, dashArray: '6,4'
-    }).addTo(limeCoverageLayer);
+    const LIME_SCOOTER_UOW = L.polygon([
+      [52.3850, -1.5700],
+      [52.3850, -1.5500],
+      [52.3700, -1.5500],
+      [52.3700, -1.5700],
+    ], { color: '#7c3aed', fillColor: '#7c3aed',
+         fillOpacity: 0.15, weight: 2,
+         dashArray: '4,4' });
+
+    const LIME_SCOOTER_BHAM = L.polygon([
+      [52.4900, -1.9100],
+      [52.4900, -1.8600],
+      [52.4700, -1.8600],
+      [52.4700, -1.9100],
+    ], { color: '#7c3aed', fillColor: '#7c3aed',
+         fillOpacity: 0.15, weight: 2,
+         dashArray: '4,4' });
+
+    limeCoverageLayer = L.layerGroup([LIME_BIKE_COVENTRY, LIME_SCOOTER_UOW, LIME_SCOOTER_BHAM]);
 
     // No-coverage (red) markers
     [
@@ -1100,7 +1116,7 @@
       onAdd: function() {
         const div = L.DomUtil.create('div');
         div.style.cssText = 'background:#fff;padding:8px 12px;border-radius:8px;border:1px solid #E8EBF0;font-size:11px;color:#003366;line-height:1.9;box-shadow:0 1px 4px rgba(0,0,0,0.12);';
-        div.innerHTML = '<div>🟢 Lime active zone</div><div>🔴 No Lime coverage</div>';
+        div.innerHTML = '<div>🟢 Lime Bike zone</div><div>🟣 Lime Scooter zone</div><div>🔴 No Lime coverage</div>';
         return div;
       }
     });
@@ -1112,18 +1128,18 @@
       onAdd: function(m) {
         const btn = L.DomUtil.create('button');
         btn.style.cssText = 'background:#fff;border:1.5px solid #16a34a;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:600;color:#16a34a;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.12);white-space:nowrap;';
-        btn.textContent = '🚲 Hide Lime coverage';
+        btn.textContent = '🚲 Show/Hide Lime zones';
         L.DomEvent.on(btn, 'click', function(e) {
           L.DomEvent.stopPropagation(e);
           limeCoverageVisible = !limeCoverageVisible;
           if (limeCoverageVisible) {
             limeCoverageLayer.addTo(m);
-            btn.textContent = '🚲 Hide Lime coverage';
+            btn.textContent = '🚲 Show/Hide Lime zones';
             btn.style.color = '#16a34a';
             btn.style.borderColor = '#16a34a';
           } else {
             m.removeLayer(limeCoverageLayer);
-            btn.textContent = '🚲 Show Lime coverage';
+            btn.textContent = '🚲 Show/Hide Lime zones';
             btn.style.color = '#999999';
             btn.style.borderColor = '#cccccc';
           }
@@ -1569,8 +1585,8 @@
       service: 'cycling', cost: 0, time: personalBikeTime, co2: 0.0, reliability: 95, limeUnavailable: false,
       subOptions: [
         { icon: '🚴', name: 'Personal bike', cost: 0,                time: personalBikeTime, co2: 0.0, notes: 'Your own bike — no cost, no app needed',           service: 'cycling',      available: true },
-        { icon: '🚲', name: 'Lime Bike',    cost: limeBikeCostFinal,    time: limeBikeTime, co2: 0.0, notes: _uniRider && limeBikeTime <= 30 ? 'Free with UniRider · Electric-assisted' : 'Electric-assisted · £1.00 + £0.15/min (WMCA rate) · Free first 30 min with UniRider', service: 'lime',         available: limeAvailHere },
-        { icon: '🛴', name: 'Lime Scooter', cost: limeScooterCostFinal, time: scooterTime,  co2: 0.2, notes: '£1.00 unlock + £0.20/min (WMCA rate) · Lime app required',                                                                                                         service: 'lime-scooter', available: limeAvailHere },
+        { icon: '🚲', name: 'Lime Bike',    cost: limeBikeCostFinal,    time: limeBikeTime, co2: 0.0, notes: 'Electric-assisted · Lime app required',                                                                                                                        service: 'lime',         available: limeAvailHere },
+        { icon: '🛴', name: 'Lime Scooter', cost: limeScooterCostFinal, time: scooterTime,  co2: 0.2, notes: 'Lime app required · helmet recommended',                                                                                                                         service: 'lime-scooter', available: limeAvailHere },
         ...(isKenilworthRoute ? [{ icon: '🚲', name: 'Brompton hire', cost: 5.00, time: personalBikeTime, co2: 0.0, notes: 'Hire from Kenilworth Station · £5/day', service: 'cycling', available: true }] : [])
       ]
     });
