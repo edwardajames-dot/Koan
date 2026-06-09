@@ -955,7 +955,7 @@
     'uow|leamington-town': [
       { route: 'Bus (U2)',        cost: 2.40, time: 42, reliability: 82, notes: 'U2 direct to Leamington',                                  service: 'bus',   co2: 0.7 },
       { route: 'Train',           cost: 6.50, time: 52, reliability: 75, notes: 'Walk to Canley + change at Coventry · 16-25 Railcard saves 1/3', service: 'train', co2: 0.6 },
-      { route: 'Lime Bike',       cost: 0,    time: 42, reliability: 80, notes: 'Long cycle route — free with UniRider',                    service: 'lime',  co2: 0.0 },
+      { route: 'Lime Bike',       cost: 0,    time: 42, reliability: 80, notes: 'Long cycle route · Lime app required',                    service: 'lime',  co2: 0.0 },
       { route: 'Uber',            cost: 14.00,time: 22, reliability: 92, notes: 'Surge pricing may apply · estimate only',                  service: 'uber',  co2: 1.4 }
     ],
     // UoW → Leamington Spa Train Station (~10.4km — station is destination, no extra walk)
@@ -1060,6 +1060,15 @@
     });
 
     // ── Lime Coverage Overlay ──────────────────────────────────────
+    const LIME_BIKE_BHAM = L.polygon([
+      [52.5300, -1.9500],
+      [52.5300, -1.7800],
+      [52.4200, -1.7800],
+      [52.4200, -1.9500],
+    ], { color: '#16a34a', fillColor: '#16a34a',
+         fillOpacity: 0.12, weight: 2,
+         dashArray: '6,4' });
+
     const LIME_BIKE_COVENTRY = L.polygon([
       [52.4400, -1.5500],
       [52.4300, -1.4700],
@@ -1071,6 +1080,7 @@
     ], { color: '#16a34a', fillColor: '#16a34a',
          fillOpacity: 0.15, weight: 2,
          dashArray: '6,4' });
+    LIME_BIKE_COVENTRY.bindPopup('<div style="font-size:12px;">Lime Bike available here</div>');
 
     const LIME_SCOOTER_UOW = L.polygon([
       [52.3850, -1.5700],
@@ -1080,6 +1090,7 @@
     ], { color: '#7c3aed', fillColor: '#7c3aed',
          fillOpacity: 0.15, weight: 2,
          dashArray: '4,4' });
+    LIME_SCOOTER_UOW.bindPopup('<div style="font-size:12px;">Lime Scooter available on UoW campus</div>');
 
     const LIME_SCOOTER_BHAM = L.polygon([
       [52.4900, -1.9100],
@@ -1090,7 +1101,7 @@
          fillOpacity: 0.15, weight: 2,
          dashArray: '4,4' });
 
-    limeCoverageLayer = L.layerGroup([LIME_BIKE_COVENTRY, LIME_SCOOTER_UOW, LIME_SCOOTER_BHAM]);
+    limeCoverageLayer = L.layerGroup([LIME_BIKE_BHAM, LIME_BIKE_COVENTRY, LIME_SCOOTER_UOW, LIME_SCOOTER_BHAM]);
 
     // No-coverage (red) markers
     [
@@ -1116,7 +1127,7 @@
       onAdd: function() {
         const div = L.DomUtil.create('div');
         div.style.cssText = 'background:#fff;padding:8px 12px;border-radius:8px;border:1px solid #E8EBF0;font-size:11px;color:#003366;line-height:1.9;box-shadow:0 1px 4px rgba(0,0,0,0.12);';
-        div.innerHTML = '<div>🟢 Lime Bike zone</div><div>🟣 Lime Scooter zone</div><div>🔴 No Lime coverage</div>';
+        div.innerHTML = '<div>🟢 Lime Bike zone (Birmingham + Coventry + UoW)</div><div>🟣 Lime Scooter zone (Birmingham centre + UoW only)</div><div>🔴 No Lime coverage (Kenilworth · Leamington · Warwick)</div>';
         return div;
       }
     });
@@ -1570,14 +1581,8 @@
     const isKenilworthRoute = ['kenilworth', 'kenilworth-station'].includes(fromLoc.id) ||
                               ['kenilworth', 'kenilworth-station'].includes(toLoc.id);
     // WMCA contract rates: bike £1.00 + £0.15/min, scooter £1.00 + £0.20/min
-    // UniRider gives first 30 min free on BIKE ONLY (not scooter)
-    const _uniRider = state.wallet.unirider;
-    const _limeBikeRaw       = parseFloat((1.00 + limeBikeTime * 0.15).toFixed(2));
-    const _limeScooterRaw    = parseFloat((1.00 + scooterTime  * 0.20).toFixed(2));
-    const limeBikeCostFinal  = _uniRider
-      ? (limeBikeTime <= 30 ? 0.00 : parseFloat((1.00 + (limeBikeTime - 30) * 0.15).toFixed(2)))
-      : _limeBikeRaw;
-    const limeScooterCostFinal = _limeScooterRaw; // UniRider does NOT apply to scooters
+    const limeBikeCostFinal    = parseFloat((1.00 + limeBikeTime * 0.15).toFixed(2));
+    const limeScooterCostFinal = parseFloat((1.00 + scooterTime  * 0.20).toFixed(2));
     routesWithAvailability.push({
       type: 'accordion', accordionId: 'bikes-scooters',
       route: 'Bikes & Scooters',
