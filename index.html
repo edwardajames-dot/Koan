@@ -619,9 +619,9 @@
     { id: 4, name: "Leamington Town Flats", price: 450, lat: 52.2876, lng: -1.5342, area: "Leamington Spa", beds: 45, distance: 8.5, bestRoute: "Train", routeCost: 5.0, routeTime: 15, reliability: 88, provider: "IQ Student" },
     { id: 5, name: "Warwick Student Rooms", price: 480, lat: 52.2811, lng: -1.5860, area: "Warwick Town", beds: 38, distance: 4.2, bestRoute: "U2", routeCost: 2.5, routeTime: 25, reliability: 89, provider: "Mezzino" },
     { id: 6, name: "Kenilworth Gate", price: 420, lat: 52.3416, lng: -1.5755, area: "Kenilworth", beds: 52, distance: 3.8, bestRoute: "U2", routeCost: 2.5, routeTime: 28, reliability: 91, provider: "IQ Student" },
-    { id: 7, name: "Wyken Warehouse Lofts", price: 330, lat: 52.3800, lng: -1.4550, area: "Wyken, Coventry", beds: 40, distance: 3.2, bestRoute: "U1", routeCost: 2.5, routeTime: 30, reliability: 85, provider: "Vita Student" },
+    { id: 11, name: "Canley Student Houses", price: 520, lat: 52.3850, lng: -1.5450, area: "Canley, Coventry", beds: 40, distance: 0.8, bestRoute: "Walk", routeCost: 0, routeTime: 8, reliability: 98, provider: "Private" },
     { id: 8, name: "Foleshill Budget Stay", price: 310, lat: 52.4050, lng: -1.5000, area: "Foleshill, Coventry", beds: 55, distance: 3.5, bestRoute: "12X", routeCost: 2.5, routeTime: 32, reliability: 87, provider: "Mezzino" },
-    { id: 9, name: "Whitley Park Residence", price: 360, lat: 52.3650, lng: -1.4700, area: "Whitley, Coventry", beds: 48, distance: 2.8, bestRoute: "11", routeCost: 2.5, routeTime: 36, reliability: 93, provider: "IQ Student" },
+    { id: 12, name: "Stivichale Student Houses", price: 490, lat: 52.3650, lng: -1.5150, area: "Stivichale, Coventry", beds: 48, distance: 2.3, bestRoute: "Lime Bike", routeCost: 1.5, routeTime: 18, reliability: 90, provider: "Private" },
     { id: 10, name: "Styvechale Station View", price: 420, lat: 52.3565, lng: -1.5500, area: "Styvechale, Coventry", beds: 62, distance: 2.3, bestRoute: "60", routeCost: 2.5, routeTime: 33, reliability: 88, provider: "Vita Student" }
   ];
 
@@ -646,8 +646,9 @@
     { id: 'earlsdon', name: 'Earlsdon, Coventry', lat: 52.3888, lng: -1.5067, area: 'Coventry', postcodes: ['CV5'] },
     { id: 'tile-hill', name: 'Tile Hill, Coventry', lat: 52.3950, lng: -1.4850, area: 'Coventry', postcodes: ['CV4'] },
     { id: 'canley', name: 'Canley, Coventry', lat: 52.3705, lng: -1.5234, area: 'Coventry', postcodes: ['CV4'] },
-    { id: 'wyken', name: 'Wyken, Coventry', lat: 52.3800, lng: -1.4550, area: 'Coventry', postcodes: ['CV2'] },
-    { id: 'foleshill', name: 'Foleshill, Coventry', lat: 52.4050, lng: -1.5000, area: 'Coventry', postcodes: ['CV6'] }
+    { id: 'stivichale', name: 'Stivichale, Coventry', lat: 52.3650, lng: -1.5150, area: 'Coventry', postcodes: ['CV3'] },
+    { id: 'foleshill', name: 'Foleshill, Coventry', lat: 52.4050, lng: -1.5000, area: 'Coventry', postcodes: ['CV6'] },
+    { id: 'uk-central', name: 'UK Central Gateway (NEC)', lat: 52.4519, lng: -1.7250, area: 'Solihull', postcodes: ['B40'], note: 'NEC/HS2 Interchange · WMCA growth corridor' }
   ];
 
   // Lime service area (Coventry + UoW campus)
@@ -883,12 +884,12 @@
       { route: 'Uber',     cost: 9.50, time: 18, reliability: 90, notes: 'Direct',                                                   service: 'uber',  co2: 1.4 }
     ],
     'kenilworth|coventry-city': [
-      { route: 'Bus',   cost: 2.40, time: 32, reliability: 85, notes: 'Via Coventry city centre',                                                    service: 'bus',   co2: 0.7 },
+      { route: 'Bus',   cost: 2.50, time: 32, reliability: 85, notes: 'Via Coventry city centre',                                                    service: 'bus',   co2: 0.7 },
       { route: 'Train', cost: 3.80, time: 10, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services · 16-25 Railcard saves 1/3', service: 'train', co2: 0.3 },
       { route: 'Uber',  cost: 12.00,time: 18, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth-station|coventry-city': [
-      { route: 'Bus',   cost: 2.40, time: 32, reliability: 85, notes: 'Via Coventry city centre',                                                    service: 'bus',   co2: 0.7 },
+      { route: 'Bus',   cost: 2.50, time: 32, reliability: 85, notes: 'Via Coventry city centre',                                                    service: 'bus',   co2: 0.7 },
       { route: 'Train', cost: 3.80, time: 10, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services · 16-25 Railcard saves 1/3', service: 'train', co2: 0.3 },
       { route: 'Uber',  cost: 12.00,time: 18, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
@@ -897,85 +898,85 @@
       { route: 'Uber',  cost: 12.00,time: 18, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth-station|coventry-train': [
-      { route: 'Bus',   cost: 2.40, time: 28, reliability: 85, notes: 'National Express 11 or Stagecoach X17 · every 15-30 min',                     service: 'bus',   co2: 0.7 },
+      { route: 'Bus',   cost: 2.50, time: 28, reliability: 85, notes: 'National Express 11 or Stagecoach X17 · every 15-30 min',                     service: 'bus',   co2: 0.7 },
       { route: 'Train', cost: 3.80, time: 10, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services · 16-25 Railcard saves 1/3', service: 'train', co2: 0.3 },
       { route: 'Uber',  cost: 12.00,time: 18, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth|leamington-town': [
-      { route: 'Bus',   cost: 2.40, time: 25, reliability: 80, notes: 'Via Leamington',                                                              service: 'bus',   co2: 0.7 },
+      { route: 'Bus',   cost: 2.50, time: 25, reliability: 80, notes: 'Via Leamington',                                                              service: 'bus',   co2: 0.7 },
       { route: 'Train', cost: 3.80, time:  8, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services · 16-25 Railcard saves 1/3', service: 'train', co2: 0.2 },
       { route: 'Uber',  cost: 13.00,time: 15, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth-station|leamington-town': [
-      { route: 'Bus',   cost: 2.40, time: 20, reliability: 80, notes: 'National Express 11 · frequent service',                                      service: 'bus',   co2: 0.7 },
+      { route: 'Bus',   cost: 2.50, time: 20, reliability: 80, notes: 'National Express 11 · frequent service',                                      service: 'bus',   co2: 0.7 },
       { route: 'Train', cost: 3.80, time:  8, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services · 16-25 Railcard saves 1/3', service: 'train', co2: 0.2 },
       { route: 'Uber',  cost: 13.00,time: 15, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth|leamington-train': [
-      { route: 'Bus',   cost: 2.40, time: 20, reliability: 80, notes: 'National Express 11 · frequent service',                                      service: 'bus',   co2: 0.7 },
+      { route: 'Bus',   cost: 2.50, time: 20, reliability: 80, notes: 'National Express 11 · frequent service',                                      service: 'bus',   co2: 0.7 },
       { route: 'Train', cost: 3.80, time:  8, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services · 16-25 Railcard saves 1/3', service: 'train', co2: 0.2 },
       { route: 'Uber',  cost: 13.00,time: 15, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth-station|leamington-train': [
-      { route: 'Bus',   cost: 2.40, time: 20, reliability: 80, notes: 'National Express 11 · frequent service',                                      service: 'bus',   co2: 0.7 },
+      { route: 'Bus',   cost: 2.50, time: 20, reliability: 80, notes: 'National Express 11 · frequent service',                                      service: 'bus',   co2: 0.7 },
       { route: 'Train', cost: 3.80, time:  8, reliability: 85, notes: 'West Midlands Railway · approx hourly · check timetable for Sunday services · 16-25 Railcard saves 1/3', service: 'train', co2: 0.2 },
       { route: 'Uber',  cost: 13.00,time: 15, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth|warwick-town': [
-      { route: 'Bus',   cost: 2.40, time: 28, reliability: 80, notes: 'Via town centre',                                                             service: 'bus',   co2: 0.7 },
-      { route: 'Train', cost: 5.20, time: 22, reliability: 78, notes: 'Change at Leamington Spa · 16-25 Railcard saves 1/3 · check timetable for Sunday services', service: 'train', co2: 0.4 },
+      { route: 'Bus',   cost: 2.50, time: 28, reliability: 80, notes: 'Via town centre',                                                             service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 5.20, time: 28, reliability: 78, notes: 'Change at Leamington Spa · 16-25 Railcard saves 1/3 · check timetable for Sunday services', service: 'train', co2: 0.4 },
       { route: 'Uber',  cost: 10.50,time: 14, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth-station|warwick-town': [
-      { route: 'Bus',   cost: 2.40, time: 28, reliability: 80, notes: 'National Express 11 or Stagecoach X17 · every 15-30 min',                     service: 'bus',   co2: 0.7 },
-      { route: 'Train', cost: 5.20, time: 22, reliability: 78, notes: 'Change at Leamington Spa · 16-25 Railcard saves 1/3 · check timetable for Sunday services', service: 'train', co2: 0.4 },
+      { route: 'Bus',   cost: 2.50, time: 28, reliability: 80, notes: 'National Express 11 or Stagecoach X17 · every 15-30 min',                     service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 5.20, time: 18, reliability: 78, notes: 'Change at Leamington Spa · 16-25 Railcard saves 1/3 · check timetable for Sunday services', service: 'train', co2: 0.4 },
       { route: 'Uber',  cost: 10.50,time: 14, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     'kenilworth-station|warwick-station': [
-      { route: 'Bus',   cost: 2.40, time: 28, reliability: 80, notes: 'National Express 11 or Stagecoach X17 · every 15-30 min',                     service: 'bus',   co2: 0.7 },
-      { route: 'Train', cost: 5.20, time: 22, reliability: 78, notes: 'Change at Leamington Spa · 16-25 Railcard saves 1/3 · check timetable for Sunday services', service: 'train', co2: 0.4 },
+      { route: 'Bus',   cost: 2.50, time: 28, reliability: 80, notes: 'National Express 11 or Stagecoach X17 · every 15-30 min',                     service: 'bus',   co2: 0.7 },
+      { route: 'Train', cost: 5.20, time: 18, reliability: 78, notes: 'Change at Leamington Spa · 16-25 Railcard saves 1/3 · check timetable for Sunday services', service: 'train', co2: 0.4 },
       { route: 'Uber',  cost: 10.50,time: 14, reliability: 92, notes: 'Surge pricing may apply · estimate only',                                     service: 'uber',  co2: 1.4 }
     ],
     // ── Demo corridors ────────────────────────────────────────────
     // UoW → Coventry City Centre (~4.6km)
     'uow|coventry-city': [
-      { route: 'Bus (U1/U2)', cost: 2.40, time: 20, reliability: 88, notes: 'U1/U2 to city centre',                                        service: 'bus',   co2: 0.7 },
+      { route: 'Bus (U1/U2)', cost: 2.50, time: 20, reliability: 88, notes: 'U1/U2 to city centre',                                        service: 'bus',   co2: 0.7 },
       { route: 'Train',        cost: 4.50, time: 25, reliability: 82, notes: 'Walk to Canley (~15 min) + 8 min train · 16-25 Railcard saves 1/3', service: 'train', co2: 0.4 },
       { route: 'Lime Bike',    cost: 4.00, time: 20, reliability: 85, notes: 'Cycle route',                                                 service: 'lime',  co2: 0.0 },
       { route: 'Uber',         cost: 8.00, time: 12, reliability: 92, notes: 'Surge pricing may apply · estimate only',                     service: 'uber',  co2: 1.4 }
     ],
     // UoW → Coventry Train Station (~4.6km)
     'uow|coventry-train': [
-      { route: 'Bus (U1/U2)', cost: 2.40, time: 20, reliability: 88, notes: 'U1/U2 to city centre',                                        service: 'bus',   co2: 0.7 },
+      { route: 'Bus (U1/U2)', cost: 2.50, time: 20, reliability: 88, notes: 'U1/U2 to city centre',                                        service: 'bus',   co2: 0.7 },
       { route: 'Train',        cost: 4.50, time: 25, reliability: 82, notes: 'Walk to Canley (~15 min) + 8 min train · 16-25 Railcard saves 1/3', service: 'train', co2: 0.4 },
       { route: 'Lime Bike',    cost: 4.00, time: 20, reliability: 85, notes: 'Cycle route',                                                 service: 'lime',  co2: 0.0 },
       { route: 'Uber',         cost: 8.00, time: 12, reliability: 92, notes: 'Surge pricing may apply · estimate only',                     service: 'uber',  co2: 1.4 }
     ],
     // UoW → Leamington Spa Town Centre (~10.4km)
     'uow|leamington-town': [
-      { route: 'Bus (U2)',        cost: 2.40, time: 42, reliability: 82, notes: 'U2 direct to Leamington',                                  service: 'bus',   co2: 0.7 },
+      { route: 'Bus (U2)',        cost: 2.50, time: 42, reliability: 82, notes: 'U2 direct to Leamington',                                  service: 'bus',   co2: 0.7 },
       { route: 'Train',           cost: 6.50, time: 52, reliability: 75, notes: 'Walk to Canley + change at Coventry · 16-25 Railcard saves 1/3', service: 'train', co2: 0.6 },
       { route: 'Lime Bike',       cost: 0,    time: 42, reliability: 80, notes: 'Long cycle route · Lime app required',                    service: 'lime',  co2: 0.0 },
       { route: 'Uber',            cost: 14.00,time: 22, reliability: 92, notes: 'Surge pricing may apply · estimate only',                  service: 'uber',  co2: 1.4 }
     ],
     // UoW → Leamington Spa Train Station (~10.4km — station is destination, no extra walk)
     'uow|leamington-train': [
-      { route: 'Bus (U2)', cost: 2.40, time: 45, reliability: 82, notes: 'U2 to Leamington',                                               service: 'bus',   co2: 0.7 },
+      { route: 'Bus (U2)', cost: 2.50, time: 45, reliability: 82, notes: 'U2 to Leamington',                                               service: 'bus',   co2: 0.7 },
       { route: 'Train',    cost: 6.50, time: 52, reliability: 75, notes: 'Walk to Canley + change at Coventry · 16-25 Railcard saves 1/3',  service: 'train', co2: 0.6 },
       { route: 'Cycle',    cost: 0,    time: 42, reliability: 85, notes: 'Cycle route',                                                     service: 'lime',  co2: 0.0 },
       { route: 'Uber',     cost: 14.00,time: 20, reliability: 92, notes: 'Surge pricing may apply · estimate only',                         service: 'uber',  co2: 1.4 }
     ],
     // UoW → Warwick Parkway Station (~8km — no direct train from Canley)
     'uow|warwick-parkway': [
-      { route: 'Bus',   cost: 2.40, time: 32, reliability: 85, notes: 'Bus via Warwick town',                                              service: 'bus',   co2: 0.7 },
+      { route: 'Bus',   cost: 2.50, time: 32, reliability: 85, notes: 'Bus via Warwick town',                                              service: 'bus',   co2: 0.7 },
       { route: 'Train', cost: 4.80, time: 48, reliability: 75, notes: 'Walk to Canley + change at Coventry · 16-25 Railcard saves 1/3',   service: 'train', co2: 0.3 },
       { route: 'Cycle', cost: 0,    time: 30, reliability: 88, notes: 'Cycle via greenway',                                               service: 'lime',  co2: 0.0 },
       { route: 'Uber',  cost: 11.50,time: 15, reliability: 92, notes: 'Surge pricing may apply · estimate only',                          service: 'uber',  co2: 1.4 }
     ],
     // Kenilworth → Warwick Station (~7km)
     'kenilworth|warwick-station': [
-      { route: 'X17 Bus', cost: 2.40, time: 32, reliability: 80, notes: 'X17 direct',                                                     service: 'bus',   co2: 0.7 },
-      { route: 'Train',   cost: 5.20, time: 22, reliability: 78, notes: 'Change at Leamington Spa · 16-25 Railcard saves 1/3 · check timetable for Sunday services', service: 'train', co2: 0.4 },
+      { route: 'X17 Bus', cost: 2.50, time: 32, reliability: 80, notes: 'X17 direct',                                                     service: 'bus',   co2: 0.7 },
+      { route: 'Train',   cost: 5.20, time: 28, reliability: 78, notes: 'Change at Leamington Spa · 16-25 Railcard saves 1/3 · check timetable for Sunday services', service: 'train', co2: 0.4 },
       { route: 'Cycle',   cost: 0,    time: 28, reliability: 85, notes: 'Cycle route',                                                    service: 'lime',  co2: 0.0 },
       { route: 'Uber',    cost: 10.50,time: 16, reliability: 92, notes: 'Surge pricing may apply · estimate only',                        service: 'uber',  co2: 1.4 }
     ]
@@ -2032,7 +2033,9 @@
         <div id="demand-panel-body" style="overflow:hidden;max-height:0;transition:max-height 0.35s ease;">
           <div style="padding:0 14px 16px;">
             <div style="display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin-bottom:14px;align-items:baseline;">
-              <span style="font-size:1.3em;font-weight:700;color:#6B21A8;">29,500</span><span style="font-size:0.85em;color:#666;">UoW students</span>
+              <span style="font-size:1.3em;font-weight:700;color:#6B21A8;">29,500</span><span style="font-size:0.85em;color:#666;">UoW students total</span>
+              <span style="font-size:1.3em;font-weight:700;color:#6B21A8;">~7,500</span><span style="font-size:0.85em;color:#666;">live on campus</span>
+              <span style="font-size:1.3em;font-weight:700;color:#6B21A8;">~10,000</span><span style="font-size:0.85em;color:#666;">live in Coventry</span>
               <span style="font-size:1.3em;font-weight:700;color:#6B21A8;">~4,300</span><span style="font-size:0.85em;color:#666;">live in Leamington Spa*</span>
               <span style="font-size:1.3em;font-weight:700;color:#6B21A8;">~1,000+</span><span style="font-size:0.85em;color:#666;">live in Kenilworth*</span>
               <span style="font-size:1.3em;font-weight:700;color:#6B21A8;">3 mi</span><span style="font-size:0.85em;color:#666;">Kenilworth → UoW campus</span>
