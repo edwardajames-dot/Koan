@@ -621,8 +621,8 @@
     { id: 6, name: "Kenilworth Gate", price: 420, lat: 52.3416, lng: -1.5755, area: "Kenilworth", beds: 52, distance: 3.8, bestRoute: "U2", routeCost: 2.5, routeTime: 28, reliability: 91, provider: "IQ Student" },
     { id: 11, name: "Canley Student Houses", price: 520, lat: 52.3850, lng: -1.5450, area: "Canley, Coventry", beds: 40, distance: 0.8, bestRoute: "Walk", routeCost: 0, routeTime: 8, reliability: 98, provider: "Private" },
     { id: 8, name: "Foleshill Budget Stay", price: 310, lat: 52.4050, lng: -1.5000, area: "Foleshill, Coventry", beds: 55, distance: 3.5, bestRoute: "12X", routeCost: 2.5, routeTime: 32, reliability: 87, provider: "Mezzino" },
-    { id: 12, name: "Stivichale Student Houses", price: 490, lat: 52.3650, lng: -1.5150, area: "Stivichale, Coventry", beds: 48, distance: 2.3, bestRoute: "Lime Bike", routeCost: 1.5, routeTime: 18, reliability: 90, provider: "Private" },
-    { id: 10, name: "Styvechale Station View", price: 420, lat: 52.3565, lng: -1.5500, area: "Styvechale, Coventry", beds: 62, distance: 2.3, bestRoute: "60", routeCost: 2.5, routeTime: 33, reliability: 88, provider: "Vita Student" }
+    { id: 12, name: "Stivichale Student Houses", price: 490, lat: 52.3900, lng: -1.5050, area: "Stivichale, Coventry", beds: 48, distance: 2.3, bestRoute: "Lime Bike", routeCost: 1.5, routeTime: 18, reliability: 90, provider: "Private" },
+    { id: 10, name: "Styvechale Station View", price: 420, lat: 52.3900, lng: -1.5050, area: "Styvechale, Coventry", beds: 62, distance: 2.3, bestRoute: "60", routeCost: 2.5, routeTime: 33, reliability: 88, provider: "Vita Student" }
   ];
 
   // Calculate value scores
@@ -646,7 +646,7 @@
     { id: 'earlsdon', name: 'Earlsdon, Coventry', lat: 52.3888, lng: -1.5067, area: 'Coventry', postcodes: ['CV5'] },
     { id: 'tile-hill', name: 'Tile Hill, Coventry', lat: 52.3950, lng: -1.4850, area: 'Coventry', postcodes: ['CV4'] },
     { id: 'canley', name: 'Canley, Coventry', lat: 52.3705, lng: -1.5234, area: 'Coventry', postcodes: ['CV4'] },
-    { id: 'stivichale', name: 'Stivichale, Coventry', lat: 52.3650, lng: -1.5150, area: 'Coventry', postcodes: ['CV3'] },
+    { id: 'stivichale', name: 'Stivichale, Coventry', lat: 52.3900, lng: -1.5050, area: 'Coventry', postcodes: ['CV3'] },
     { id: 'foleshill', name: 'Foleshill, Coventry', lat: 52.4050, lng: -1.5000, area: 'Coventry', postcodes: ['CV6'] },
     { id: 'uk-central', name: 'UK Central Gateway (NEC)', lat: 52.4519, lng: -1.7250, area: 'Solihull', postcodes: ['B40'], note: 'NEC/HS2 Interchange · WMCA growth corridor' }
   ];
@@ -1088,12 +1088,14 @@
     LIME_BIKE_COVENTRY.bindPopup('<div style="font-size:12px;">Lime Bike available here</div>');
 
     const LIME_SCOOTER_UOW = L.polygon([
-      [52.3850, -1.5700],
-      [52.3850, -1.5500],
-      [52.3700, -1.5500],
-      [52.3700, -1.5700],
+      [52.3870, -1.5680],  // NW campus (Kirby Corner)
+      [52.3880, -1.5580],  // N campus (main entrance)
+      [52.3820, -1.5480],  // NE campus (Gibbet Hill)
+      [52.3750, -1.5500],  // SE campus (sports centre)
+      [52.3730, -1.5620],  // S campus (Westwood)
+      [52.3770, -1.5720],  // SW campus (Tocil)
     ], { color: '#7c3aed', fillColor: '#7c3aed',
-         fillOpacity: 0.15, weight: 2,
+         fillOpacity: 0.20, weight: 2,
          dashArray: '4,4' });
     LIME_SCOOTER_UOW.bindPopup('<div style="font-size:12px;">Lime Scooter available on UoW campus</div>');
 
