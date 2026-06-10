@@ -1785,12 +1785,12 @@
   // ── Demo mode ───────────────────────────────────────────────────
   // DEMO_ROUTES: from/to strings must match LOCATIONS name fields exactly (source of truth)
   const DEMO_ROUTES = [
-    { label: 'UoW → Coventry',         from: 'University of Warwick',   to: 'Coventry City Centre'       },
-    { label: 'UoW → Leamington',       from: 'University of Warwick',   to: 'Leamington Spa Town Centre' },
-    { label: 'Earlsdon → UoW',         from: 'Earlsdon, Coventry',      to: 'University of Warwick'      },
-    { label: 'UoW → Parkway',          from: 'University of Warwick',   to: 'Warwick Parkway Station'       },
-    { label: 'Kenilworth → Warwick',   from: 'Kenilworth Town Centre',  to: 'Warwick Station'               },
-    { label: 'UoW → Leamington Stn',  from: 'University of Warwick',   to: 'Leamington Spa Train Station'  }
+    { label: 'UoW → Kenilworth',        from: 'University of Warwick',  to: 'Kenilworth Town Centre'       },
+    { label: 'Kenilworth → UoW',        from: 'Kenilworth Town Centre', to: 'University of Warwick'        },
+    { label: 'Kenilworth → Leamington', from: 'Kenilworth Town Centre', to: 'Leamington Spa Town Centre'   },
+    { label: 'Kenilworth → Coventry',   from: 'Kenilworth Town Centre', to: 'Coventry Train Station'       },
+    { label: 'UoW → Coventry',          from: 'University of Warwick',  to: 'Coventry Train Station'       },
+    { label: 'Earlsdon → UoW',          from: 'Earlsdon, Coventry',     to: 'University of Warwick'        },
   ];
 
   function applyDemoRoute(from, to) {
