@@ -1194,13 +1194,6 @@
       [52.3700,-1.6100],[52.3900,-1.6100]
     ], { color: '#6B21A8', fillColor: '#6B21A8', fillOpacity: 0.10, weight: 2, dashArray: '4,4' });
 
-    const ISOCHRONE_LIME = L.polygon([
-      [52.4050,-1.5900],[52.4200,-1.5400],[52.4350,-1.4900],[52.4100,-1.4500],
-      [52.3850,-1.4500],[52.3650,-1.4800],[52.3400,-1.5100],[52.3200,-1.5500],
-      [52.3100,-1.5800],[52.3200,-1.6300],[52.3412,-1.5741],[52.3600,-1.6200],
-      [52.3700,-1.6300],[52.3900,-1.6200]
-    ], { color: '#16a34a', fillColor: '#16a34a', fillOpacity: 0.12, weight: 2, dashArray: '4,4' });
-
     // UoW e-bike reach
     const LIME_15_UOW = L.polygon([
       [52.4150,-1.5618],[52.4050,-1.5000],[52.3790,-1.4850],[52.3500,-1.5000],
@@ -1246,10 +1239,9 @@
     new IsoInfo().addTo(map);
 
     const ISO_INFO = {
-      now:  { color: '#6B21A8', html: '<strong>🕐 30 min by public transport today</strong><br>Covers: Coventry · Canley · Tile Hill<br>~21,500 students within zone<br><span style="color:#ef4444;">❌ Kenilworth: 28 min (borderline)</span><br><span style="color:#ef4444;">❌ Leamington: 42 min</span><br><span style="color:#ef4444;">❌ Burton Green: no direct bus</span>' },
-      lime: { color: '#16a34a', html: '<strong>🚲 30 min door-to-door with Lime</strong><br>Newly unlocked:<br><span style="color:#16a34a;">✅ Kenilworth (15 min, £440/mo)</span><br><span style="color:#16a34a;">✅ Burton Green (12 min, £410/mo)</span><br><span style="color:#16a34a;">✅ Stoneleigh (20 min)</span><br><span style="color:#16a34a;">✅ N. Leamington (28 min)</span><br>+1,200 students · ~£80-100/mo saving' },
-      uow:  { color: '#16a34a', html: '<strong>🚲 E-bike from UoW campus</strong><br>🟢 15 min: Kenilworth · Burton Green<br>🟢 30 min: Leamington · Warwick · Coventry centre<br>No bus needed. Door to door.' },
-      ken:  { color: '#0284c7', html: '<strong>🚲 E-bike from Kenilworth Station</strong><br>🔵 15 min: UoW campus · Burton Green<br>🔵 30 min: Leamington · Warwick · Coventry outskirts<br>One docking point. Entire corridor.' }
+      now: { color: '#6B21A8', html: '<strong>🕐 30 min by public transport today</strong><br>Covers: Coventry · Canley · Tile Hill<br>~21,500 students within zone<br><span style="color:#ef4444;">❌ Kenilworth: 28 min (borderline)</span><br><span style="color:#ef4444;">❌ Leamington: 42 min</span><br><span style="color:#ef4444;">❌ Burton Green: no direct bus</span>' },
+      uow: { color: '#16a34a', html: '<strong>🚲 E-bike from UoW campus</strong><br>🟢 15 min: Kenilworth · Burton Green<br>🟢 30 min: Leamington · Warwick · Coventry centre<br>No bus needed. Door to door.' },
+      ken: { color: '#0284c7', html: '<strong>🚲 E-bike from Kenilworth Station</strong><br>🔵 15 min: UoW campus · Burton Green<br>🔵 30 min: Leamington · Warwick · Coventry outskirts<br>One docking point. Entire corridor.' }
     };
 
     function updateIsoInfoBox() {
@@ -1266,7 +1258,7 @@
     }
 
     // ── All layers registry for mutual exclusion ───────────────────
-    const ISO_LAYERS = { now: ISOCHRONE_NOW, lime: ISOCHRONE_LIME, uow: LIME_UOW_LAYER, ken: LIME_KEN_LAYER };
+    const ISO_LAYERS = { now: ISOCHRONE_NOW, uow: LIME_UOW_LAYER, ken: LIME_KEN_LAYER };
 
     function hideAllIsochrones(m, btns) {
       Object.values(ISO_LAYERS).forEach(layer => { if (m.hasLayer(layer)) m.removeLayer(layer); });
@@ -1301,10 +1293,9 @@
         }
 
         const btns = {
-          now:  makeBtn('🕐 30-min reach by public transport', '#6B21A8'),
-          lime: makeBtn('🚲 30-min reach with Lime e-bike',    '#16a34a'),
-          uow:  makeBtn('🚲 E-bike range from UoW campus',     '#16a34a'),
-          ken:  makeBtn('🚲 E-bike range from Kenilworth Stn', '#0284c7')
+          now: makeBtn('🕐 30-min reach by public transport', '#6B21A8'),
+          uow: makeBtn('🚲 E-bike range from UoW campus',     '#16a34a'),
+          ken: makeBtn('🚲 E-bike range from Kenilworth Stn', '#0284c7')
         };
 
         Object.keys(btns).forEach(key => {
