@@ -632,7 +632,11 @@
     { id: 13, name: "Kenilworth Town Centre House", price: 440, lat: 52.3412, lng: -1.5741, area: "Kenilworth", beds: 6, distance: 3.0, bestRoute: "Bus", routeCost: 2.50, routeTime: 15, reliability: 82, provider: "Private", limeUnlocked: true, limeAccessible: false },
     { id: 14, name: "Burton Green Cottages", price: 410, lat: 52.3701, lng: -1.6089, area: "Burton Green, Kenilworth", beds: 4, distance: 2.5, bestRoute: "Bus", routeCost: 2.50, routeTime: 12, reliability: 78, provider: "Private", limeUnlocked: true, limeAccessible: false },
     { id: 15, name: "Warwick Town Student House", price: 420, lat: 52.2808, lng: -1.5840, area: "Warwick Town Centre", beds: 8, distance: 4.2, bestRoute: "Bus", routeCost: 2.50, routeTime: 35, reliability: 80, provider: "Private", limeUnlocked: true, limeAccessible: false },
-    { id: 16, name: "Tile Hill Student Terrace", price: 430, lat: 52.3850, lng: -1.6050, area: "Tile Hill, Coventry", beds: 6, distance: 2.8, bestRoute: "Bus", routeCost: 2.50, routeTime: 18, reliability: 85, provider: "Private", limeUnlocked: true, limeAccessible: false }
+    { id: 16, name: "Tile Hill Student Terrace", price: 430, lat: 52.3850, lng: -1.6050, area: "Tile Hill, Coventry", beds: 6, distance: 2.8, bestRoute: "Bus", routeCost: 2.50, routeTime: 18, reliability: 85, provider: "Private", limeUnlocked: true, limeAccessible: false },
+    { id: 17, name: "Westwood Heath House", price: 460, lat: 52.3650, lng: -1.5900, area: "Westwood Heath, Coventry", beds: 5, distance: 2.0, bestRoute: "Lime Bike", routeCost: 0, routeTime: 14, reliability: 85, provider: "Private", limeUnlocked: true, limeAccessible: false },
+    { id: 18, name: "Balsall Common Student House", price: 390, lat: 52.3850, lng: -1.6450, area: "Balsall Common", beds: 5, distance: 6.0, bestRoute: "Bus", routeCost: 2.50, routeTime: 22, reliability: 78, provider: "Private", limeUnlocked: true, limeAccessible: false },
+    { id: 19, name: "North Leamington Student Terrace", price: 400, lat: 52.3200, lng: -1.5400, area: "North Leamington Spa", beds: 6, distance: 9.0, bestRoute: "Bus", routeCost: 2.50, routeTime: 28, reliability: 75, provider: "Private", limeUnlocked: true, limeAccessible: false },
+    { id: 20, name: "Kenilworth Road Student House", price: 470, lat: 52.3550, lng: -1.5450, area: "Kenilworth Road, Coventry", beds: 5, distance: 2.8, bestRoute: "Lime Bike", routeCost: 0, routeTime: 16, reliability: 85, provider: "Private", limeUnlocked: true, limeAccessible: false }
   ];
 
   // Calculate value scores: lower total monthly cost = better value
@@ -1297,10 +1301,10 @@
         }
 
         const btns = {
-          now:  makeBtn('🕐 Today\'s 30-min reach',      '#6B21A8'),
-          lime: makeBtn('🚲 30-min reach with Lime',      '#16a34a'),
-          uow:  makeBtn('🚲 Lime reach from UoW',         '#16a34a'),
-          ken:  makeBtn('🚲 Lime reach from Kenilworth',  '#0284c7')
+          now:  makeBtn('🕐 30-min reach by public transport', '#6B21A8'),
+          lime: makeBtn('🚲 30-min reach with Lime e-bike',    '#16a34a'),
+          uow:  makeBtn('🚲 E-bike range from UoW campus',     '#16a34a'),
+          ken:  makeBtn('🚲 E-bike range from Kenilworth Stn', '#0284c7')
         };
 
         Object.keys(btns).forEach(key => {
