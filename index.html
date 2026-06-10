@@ -1180,51 +1180,109 @@
     new LimeToggle().addTo(map);
 
     // ── 30-min Isochrone Overlays ──────────────────────────────────
-    var isochroneNowVisible  = false;
-    var isochroneLimeVisible = false;
+    // ── Isochrone state (4-way mutual exclusive) ──────────────────
+    var activeIsochrone = null; // 'now' | 'lime' | 'uow' | 'ken' | null
 
+    // ── Isochrone polygons ─────────────────────────────────────────
     const ISOCHRONE_NOW = L.polygon([
-      [52.4100,-1.5800],[52.4300,-1.5200],[52.4400,-1.4800],[52.4200,-1.4400],
-      [52.3900,-1.4500],[52.3600,-1.4700],[52.3400,-1.5000],[52.3300,-1.5400],
-      [52.3400,-1.6000],[52.3600,-1.6400],[52.3900,-1.6200]
-    ], { color: '#7c3aed', fillColor: '#7c3aed', fillOpacity: 0.10, weight: 2, dashArray: '5,5' });
+      [52.4050,-1.5900],[52.4200,-1.5400],[52.4350,-1.4900],[52.4100,-1.4500],
+      [52.3850,-1.4500],[52.3650,-1.4800],[52.3550,-1.5200],[52.3550,-1.5700],
+      [52.3700,-1.6100],[52.3900,-1.6100]
+    ], { color: '#6B21A8', fillColor: '#6B21A8', fillOpacity: 0.10, weight: 2, dashArray: '4,4' });
 
     const ISOCHRONE_LIME = L.polygon([
-      [52.4100,-1.5800],[52.4300,-1.5200],[52.4400,-1.4800],[52.4200,-1.4400],
-      [52.3900,-1.4500],[52.3600,-1.4700],[52.3400,-1.5000],[52.3300,-1.5400],
-      [52.3200,-1.5800],[52.3300,-1.6300],[52.3412,-1.5741],[52.3600,-1.6300],
-      [52.3800,-1.6500],[52.3900,-1.6200]
-    ], { color: '#16a34a', fillColor: '#16a34a', fillOpacity: 0.12, weight: 2, dashArray: '5,5' });
+      [52.4050,-1.5900],[52.4200,-1.5400],[52.4350,-1.4900],[52.4100,-1.4500],
+      [52.3850,-1.4500],[52.3650,-1.4800],[52.3400,-1.5100],[52.3200,-1.5500],
+      [52.3100,-1.5800],[52.3200,-1.6300],[52.3412,-1.5741],[52.3600,-1.6200],
+      [52.3700,-1.6300],[52.3900,-1.6200]
+    ], { color: '#16a34a', fillColor: '#16a34a', fillOpacity: 0.12, weight: 2, dashArray: '4,4' });
 
-    // Info box control (bottom-right)
+    // UoW e-bike reach
+    const LIME_15_UOW = L.polygon([
+      [52.4150,-1.5618],[52.4050,-1.5000],[52.3790,-1.4850],[52.3500,-1.5000],
+      [52.3430,-1.5618],[52.3500,-1.6250],[52.3790,-1.6400],[52.4050,-1.6250]
+    ], { color: '#16a34a', fillColor: '#16a34a', fillOpacity: 0.20, weight: 2 });
+
+    const LIME_30_UOW = L.polygon([
+      [52.4500,-1.5618],[52.4300,-1.4400],[52.3790,-1.4100],[52.3200,-1.4500],
+      [52.2900,-1.5618],[52.3100,-1.6900],[52.3500,-1.7200],[52.3790,-1.7000],
+      [52.4300,-1.6600]
+    ], { color: '#16a34a', fillColor: '#16a34a', fillOpacity: 0.10, weight: 2, dashArray: '8,4' });
+
+    const LIME_UOW_LAYER = L.layerGroup([LIME_15_UOW, LIME_30_UOW]);
+
+    // Kenilworth e-bike reach
+    const LIME_15_KEN = L.polygon([
+      [52.3750,-1.5726],[52.3700,-1.5200],[52.3429,-1.4950],[52.3150,-1.5200],
+      [52.3100,-1.5726],[52.3150,-1.6250],[52.3429,-1.6500],[52.3700,-1.6250]
+    ], { color: '#0284c7', fillColor: '#0284c7', fillOpacity: 0.20, weight: 2 });
+
+    const LIME_30_KEN = L.polygon([
+      [52.4150,-1.5726],[52.4050,-1.4700],[52.3429,-1.4200],[52.2900,-1.4700],
+      [52.2700,-1.5726],[52.2900,-1.6800],[52.3000,-1.7200],[52.3429,-1.7200],
+      [52.4050,-1.6800]
+    ], { color: '#0284c7', fillColor: '#0284c7', fillOpacity: 0.10, weight: 2, dashArray: '8,4' });
+
+    const KEN_STATION_MARKER = L.circleMarker([52.3429, -1.5726], {
+      radius: 8, color: '#0284c7', fillColor: '#0284c7', weight: 2, opacity: 1, fillOpacity: 1
+    }).bindPopup('<div style="font-size:12px;"><strong>📍 Kenilworth Station</strong><br>Proposed Lime docking point<br>🟢 15 min: UoW campus<br>🟢 30 min: Leamington · Warwick</div>');
+
+    const LIME_KEN_LAYER = L.layerGroup([LIME_15_KEN, LIME_30_KEN, KEN_STATION_MARKER]);
+
+    // ── Info box (bottom-right) ────────────────────────────────────
     const IsoInfo = L.Control.extend({
       options: { position: 'bottomright' },
       onAdd: function() {
         const div = L.DomUtil.create('div');
         div.id = 'iso-info-box';
-        div.style.cssText = 'display:none;background:#fff;border-left:4px solid #6B21A8;border-radius:8px;padding:8px 10px;font-size:0.8em;color:#003366;line-height:1.6;box-shadow:0 1px 4px rgba(0,0,0,0.12);width:180px;';
+        div.style.cssText = 'display:none;background:#fff;border-left:4px solid #6B21A8;border-radius:8px;padding:8px 10px;font-size:0.8em;color:#003366;line-height:1.7;box-shadow:0 1px 4px rgba(0,0,0,0.12);width:190px;';
         return div;
       }
     });
     new IsoInfo().addTo(map);
 
+    const ISO_INFO = {
+      now:  { color: '#6B21A8', html: '<strong>🕐 30 min by public transport today</strong><br>Covers: Coventry · Canley · Tile Hill<br>~21,500 students within zone<br><span style="color:#ef4444;">❌ Kenilworth: 28 min (borderline)</span><br><span style="color:#ef4444;">❌ Leamington: 42 min</span><br><span style="color:#ef4444;">❌ Burton Green: no direct bus</span>' },
+      lime: { color: '#16a34a', html: '<strong>🚲 30 min door-to-door with Lime</strong><br>Newly unlocked:<br><span style="color:#16a34a;">✅ Kenilworth (15 min, £440/mo)</span><br><span style="color:#16a34a;">✅ Burton Green (12 min, £410/mo)</span><br><span style="color:#16a34a;">✅ Stoneleigh (20 min)</span><br><span style="color:#16a34a;">✅ N. Leamington (28 min)</span><br>+1,200 students · ~£80-100/mo saving' },
+      uow:  { color: '#16a34a', html: '<strong>🚲 E-bike from UoW campus</strong><br>🟢 15 min: Kenilworth · Burton Green<br>🟢 30 min: Leamington · Warwick · Coventry centre<br>No bus needed. Door to door.' },
+      ken:  { color: '#0284c7', html: '<strong>🚲 E-bike from Kenilworth Station</strong><br>🔵 15 min: UoW campus · Burton Green<br>🔵 30 min: Leamington · Warwick · Coventry outskirts<br>One docking point. Entire corridor.' }
+    };
+
     function updateIsoInfoBox() {
       const box = document.getElementById('iso-info-box');
       if (!box) return;
-      if (isochroneNowVisible) {
+      if (activeIsochrone && ISO_INFO[activeIsochrone]) {
+        const info = ISO_INFO[activeIsochrone];
         box.style.display = 'block';
-        box.style.borderColor = '#7c3aed';
-        box.innerHTML = '<strong>🕐 30 min by public transport today</strong><br>Covers: Coventry · Canley · Earlsdon<br>~21,500 students within zone<br><span style="color:#ef4444;">❌ Kenilworth outside 30-min reach</span>';
-      } else if (isochroneLimeVisible) {
-        box.style.display = 'block';
-        box.style.borderColor = '#16a34a';
-        box.innerHTML = '<strong>🚲 30 min with Lime extended</strong><br>Adds: Kenilworth · Burton Green<br>+1,200 students newly in zone<br><span style="color:#16a34a;">💰 ~£80-100/mo cheaper rent</span>';
+        box.style.borderColor = info.color;
+        box.innerHTML = info.html;
       } else {
         box.style.display = 'none';
       }
     }
 
-    // Isochrone toggle buttons (stacked below Lime toggle, top-right)
+    // ── All layers registry for mutual exclusion ───────────────────
+    const ISO_LAYERS = { now: ISOCHRONE_NOW, lime: ISOCHRONE_LIME, uow: LIME_UOW_LAYER, ken: LIME_KEN_LAYER };
+
+    function hideAllIsochrones(m, btns) {
+      Object.values(ISO_LAYERS).forEach(layer => { if (m.hasLayer(layer)) m.removeLayer(layer); });
+      Object.values(btns).forEach(btn => { btn.style.opacity = '1'; });
+      activeIsochrone = null;
+    }
+
+    function toggleIsochrone(key, m, btns) {
+      if (activeIsochrone === key) {
+        hideAllIsochrones(m, btns);
+      } else {
+        hideAllIsochrones(m, btns);
+        ISO_LAYERS[key].addTo(m);
+        btns[key].style.opacity = '0.55';
+        activeIsochrone = key;
+      }
+      updateIsoInfoBox();
+    }
+
+    // ── Toggle button panel (top-right) ────────────────────────────
     const IsoToggles = L.Control.extend({
       options: { position: 'topright' },
       onAdd: function(m) {
@@ -1238,41 +1296,21 @@
           return b;
         }
 
-        const btnNow  = makeBtn('🕐 Today\'s 30-min reach', '#7c3aed');
-        const btnLime = makeBtn('🚲 30-min reach with Lime', '#16a34a');
+        const btns = {
+          now:  makeBtn('🕐 Today\'s 30-min reach',      '#6B21A8'),
+          lime: makeBtn('🚲 30-min reach with Lime',      '#16a34a'),
+          uow:  makeBtn('🚲 Lime reach from UoW',         '#16a34a'),
+          ken:  makeBtn('🚲 Lime reach from Kenilworth',  '#0284c7')
+        };
 
-        L.DomEvent.on(btnNow, 'click', function(e) {
-          L.DomEvent.stopPropagation(e);
-          if (isochroneNowVisible) {
-            m.removeLayer(ISOCHRONE_NOW);
-            isochroneNowVisible = false;
-            btnNow.style.opacity = '1';
-          } else {
-            if (isochroneLimeVisible) { m.removeLayer(ISOCHRONE_LIME); isochroneLimeVisible = false; btnLime.style.opacity = '1'; }
-            ISOCHRONE_NOW.addTo(m);
-            isochroneNowVisible = true;
-            btnNow.style.opacity = '0.6';
-          }
-          updateIsoInfoBox();
+        Object.keys(btns).forEach(key => {
+          L.DomEvent.on(btns[key], 'click', function(e) {
+            L.DomEvent.stopPropagation(e);
+            toggleIsochrone(key, m, btns);
+          });
+          wrap.appendChild(btns[key]);
         });
 
-        L.DomEvent.on(btnLime, 'click', function(e) {
-          L.DomEvent.stopPropagation(e);
-          if (isochroneLimeVisible) {
-            m.removeLayer(ISOCHRONE_LIME);
-            isochroneLimeVisible = false;
-            btnLime.style.opacity = '1';
-          } else {
-            if (isochroneNowVisible) { m.removeLayer(ISOCHRONE_NOW); isochroneNowVisible = false; btnNow.style.opacity = '1'; }
-            ISOCHRONE_LIME.addTo(m);
-            isochroneLimeVisible = true;
-            btnLime.style.opacity = '0.6';
-          }
-          updateIsoInfoBox();
-        });
-
-        wrap.appendChild(btnNow);
-        wrap.appendChild(btnLime);
         return wrap;
       }
     });
@@ -1287,7 +1325,7 @@
       <div class="accom-card">
         <div class="accom-header">
           <div>
-            <div class="accom-name">${idx + 1}. ${acc.name}</div>
+            <div class="accom-name">${acc.name}</div>
             <div style="font-size: 11px; color: #999999; margin-top: 4px;">${acc.area}</div>
             ${badge}
           </div>
